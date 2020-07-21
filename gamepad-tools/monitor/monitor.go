@@ -72,6 +72,8 @@ const (
     ErrWinSyscall
     // Failed to retrieve the payload length
     ErrInvalidLength
+    // No gamepad has been detected yet
+    ErrNoGamepad
 )
 
 // `err()` converts an `ErrorCode` into an `error` interface, returning
@@ -136,6 +138,8 @@ func (e ErrorCode) Error() string {
             return "The Monitor interface was closed and shouldn't be used anymore"
         case ErrInvalidLength:
             return "Failed to retrieve the payload length"
+        case ErrNoGamepad:
+            return "No gamepad has been detected yet"
         default:
             return "Unknown error"
     }
