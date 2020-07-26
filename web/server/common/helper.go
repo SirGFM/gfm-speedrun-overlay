@@ -1,7 +1,7 @@
 // Interfaces used by the HTTP server. This separation was mainly to avoid
 // possible circular inclusion issues.
 //
-// This package also has a few utility functions used may multiple servers.
+// This package also has a few utility functions used by multiple servers.
 
 package common
 
