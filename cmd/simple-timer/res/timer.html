@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <style>
+            /* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
+            div.container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            div.list {
+                display: inline-flex;
+                flex-direction: row;
+                margin-bottom: 0.5em;
+            }
+
+            h2, label, input, select {
+                flex-grow: 1;
+                margin-left: 0.1em;
+                margin-right: 0.1em;
+            }
+
+            label, input, select {
+                margin-bottom: 0.5em;
+            }
+        </style>
+
+        <script type="text/javascript" src="/res/conn.js"></script>
+
+        <script>
+            let updateTimer = function(e) {
+                let res = JSON.parse(e);
+
+                let ms = res.Time % 1000;
+                let s = Math.floor((res.Time / 1000) % 60);
+                let min = Math.floor((res.Time / 60000) % 60);
+                let hour = Math.floor((res.Time / 3600000) % 24);
+
+                let txt = "";
+
+                txt += ("" + hour).padStart(2, "0") + ":";
+                txt += ("" + min).padStart(2, "0") + ":";
+                txt += ("" + s).padStart(2, "0");
+                txt += "." + ("" + ms).padStart(3, "0");
+
+                let time = document.getElementById('timer');
+                time.innerText = txt;
+            }
+
+            let pollTimer = function() {
+                conn.getData('/timer', updateTimer);
+            };
+
+            let pollThID = null;
+            let start_interval = function() {
+                let fps = document.getElementById('fps');
+                let _fps = fps.valueAsNumber;
+
+                if (pollThID == null) {
+                    pollThID = setInterval(pollTimer, 1000 / _fps);
+                }
+            }
+
+            let stop_interval = function() {
+                if (pollThID != null) {
+                    clearInterval(pollThID);
+                }
+                pollThID = null;
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h2> Running timer </h2>
+
+            <label id="timer" style="font-size: 32;" > 00:00:00.000 </label>
+
+            <div class="container">
+                <label for="fps"> Timer FPS: </label>
+                <div class="list">
+                    <input onclick="stop_interval();" type="button" value="Halt timer">
+                    <input style="flex-grow: 3;" type="number" step="1" value=10 id="fps" name="fps">
+                    <input onclick="start_interval();" type="button" value="Recv. timer">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

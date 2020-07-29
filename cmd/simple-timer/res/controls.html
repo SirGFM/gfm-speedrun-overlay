@@ -1,0 +1,107 @@
+<html>
+    <head>
+        <style>
+            /* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
+            div.container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            div.list {
+                display: inline-flex;
+                flex-direction: row;
+                margin-bottom: 0.5em;
+            }
+
+            h2, label, input, select {
+                flex-grow: 1;
+                margin-left: 0.1em;
+                margin-right: 0.1em;
+            }
+
+            label, input, select {
+                margin-bottom: 0.5em;
+            }
+        </style>
+
+        <script type="text/javascript" src="/res/conn.js"></script>
+
+        <script>
+            let onSave = function (e) {
+                console.log('OK: '+e);
+            }
+
+            let send = function(action, val=null) {
+                let req = {
+                    'Action': action,
+                };
+                if (val != null) {
+                    req.Value = val;
+                }
+                req = JSON.stringify(req);
+
+                conn.sendData('/timer', req, onSave=onSave);
+            }
+
+            let setup_time = function() {
+                let time = document.getElementById('init-time');
+                let ms = time.valueAsNumber;
+
+                send('setup', ms);
+            };
+
+            let start_time = function() {
+                send('start');
+            };
+
+            let stop_time = function() {
+                send('stop');
+            };
+
+            let reset_time = function() {
+                send('reset');
+            };
+
+            let sub_time = function() {
+                let time = document.getElementById('mod-time');
+                let ms = time.valueAsNumber;
+
+                send('sub', ms);
+            };
+
+            let add_time = function() {
+                let time = document.getElementById('mod-time');
+                let ms = time.valueAsNumber;
+
+                send('add', ms);
+            };
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h2> Timer controls </h2>
+
+            <div class="container">
+                <label for="init-time"> Set initial time: </label>
+                <div style="list">
+                    <input style="flex-grow: 2;" type="time" step="1" value="00:00:00" id="init-time" name="init-time">
+                    <input onclick="setup_time();" type="button" value="Send">
+                </div>
+            </div>
+
+            <input onclick="start_time();" type="button" value="Start timer">
+            <input onclick="stop_time();" type="button" value="Stop timer">
+            <input onclick="reset_time();" type="button" value="Reset timer">
+
+            <div class="container">
+                <label for="mod-time"> Modify time: </label>
+                <div style="list">
+                    <input onclick="sub_time();" type="button" value="-">
+                    <input style="flex-grow: 5;" type="time" step="1" value="00:00:00" id="mod-time" name="mod-time">
+                    <input onclick="add_time();" type="button" value="+">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
