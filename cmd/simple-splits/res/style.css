@@ -1,0 +1,23 @@
+/* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
+div.vlist {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+
+div.hlist {
+    display: inline-flex;
+    flex-direction: row;
+    margin-bottom: 0.15em;
+}
+
+h2, label, input, select {
+    flex-grow: 1;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+}
+
+label, input, select {
+    margin-bottom: 0.1em;
+}

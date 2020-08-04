@@ -1,0 +1,202 @@
+<html>
+    <head>
+        <link href="/res/style.css" rel="stylesheet">
+        <script type="text/javascript" src="/res/conn.js"></script>
+
+        <script>
+            /** === Remote functions === */
+            let splits = function () {
+                let delData = function(url, data) {
+                    let f = function(e) {
+                        console.log(e);
+                    };
+
+                    let req = JSON.stringify(data);
+                    conn.delData(url, req, f);
+                };
+
+                let sendData = function(url, data) {
+                    let f = function(e) {
+                        console.log(e);
+                    };
+
+                    let req = JSON.stringify(data);
+                    conn.sendData(url, req, f);
+                };
+
+                let updateData = function(url, data) {
+                    let f = function(e) {
+                        console.log(e);
+                    };
+
+                    let req = JSON.stringify(data);
+                    conn.updateData(url, req, f);
+                };
+
+                let getData = function(url, cb) {
+                    let f = function(e) {
+                        let res = JSON.parse(e);
+                        cb(res);
+                    };
+                    conn.getData(url, f);
+                };
+
+                let _load_split = function(obj) {
+                    let nodeAt = document.getElementById('split-entries');
+
+                    for (let i = nodeAt.childElementCount; i > 0; i--) {
+                        nodeAt.children[i-1].remove();
+                    }
+
+                    for (let i = 0; i < obj.Entries.length; i++) {
+                        create_split_el(nodeAt, obj.Entries[i]);
+                    }
+                };
+
+                let load_split = function(el) {
+                    let sel = document.getElementById('split-list');
+                    if (sel.value) {
+                        let url = '/splits/load/'+encodeURIComponent(sel.value);
+                        getData(url, _load_split);
+                    }
+                };
+
+                let _reload_list = function(obj) {
+                    let list = document.getElementById('split-list');
+
+                    for (let i = list.options.length; i > 1; i--) {
+                        list.options[i-1].remove();
+                    }
+
+                    for (let i = 0; i < obj.Splits.length; i++) {
+                        let name = obj.Splits[i];
+                        let opt = new Option(name, name);
+                        list.options.add(opt);
+                    }
+                };
+
+                let reload_list = function() {
+                    getData('/splits/list', _reload_list);
+                };
+
+                let save_split = function() {
+                    let entries = document.getElementById('split-entries');
+                    let name = document.getElementById('split-name');
+                    let list = [];
+
+                    for (let i = 0; i < entries.childElementCount; i++) {
+                        /* The text input is always the last element in a split */
+                        let el = entries.children[i];
+                        el = el.children[el.childElementCount-1];
+                        list.push(el.value);
+                    }
+
+                    let obj = {
+                        'Name': name.value,
+                        'Entries': list,
+                    };
+
+                    if (document.getElementById('update-split').checked) {
+                        updateData('/splits', obj);
+                    }
+                    else {
+                        sendData('/splits', obj);
+                    }
+                };
+
+                let rem_split = function() {
+                    let sel = document.getElementById('split-list');
+                    let url = '/splits/'+encodeURIComponent(sel.value);
+
+                    delData(url)
+                };
+
+                return {
+                    'load_split': load_split,
+                    'reload_list': reload_list,
+                    'save_split': save_split,
+                    'rem_split': rem_split,
+                };
+            }()
+
+            /** ===== Split modification callbacks ===== */
+
+            let rem_split_el = function(e) {
+                let el = e.parentElement;
+                el.remove();
+            };
+
+            let create_split_el = function(parent, title) {
+                let div = document.createElement('div');
+                div.setAttribute('class', 'hlist');
+
+                let remBt = document.createElement('input');
+                remBt.type = 'button';
+                remBt.value = '-';
+                remBt.onclick = function(e) { rem_split_el(e.target); };
+                remBt.style.flexGrow = 1;
+                div.appendChild(remBt);
+
+                let name = document.createElement('input');
+                name.type = 'text';
+                name.value = title;
+                name.style.flexGrow = 9;
+                div.appendChild(name);
+
+                parent.appendChild(div);
+            };
+
+            let add_split_el = function() {
+                let nodeAt = document.getElementById('split-entries');
+                create_split_el(nodeAt, '');
+            };
+
+            let reset_split = function() {
+                let list = document.getElementById('split-entries');
+                for (let i = list.childElementCount; i > 0; i--) {
+                        let el = list.children[i-1];
+                        el.remove();
+                }
+            };
+        </script>
+    </head>
+    <body>
+        <div class="vlist">
+            <h2> Splits configuration </h2>
+
+            <div class="vlist">
+                <label for="split-list"> Edit split: </label>
+                <div class="hlist">
+                    <select name="split-list" id="split-list">
+                        <option value=""> -- None -- </option>
+                    </select>
+                    <input onclick="splits.load_split();" type="button" value="Load splits">
+                </div>
+                <input onclick="splits.reload_list();" type="button" value="Reload list">
+                <input onclick="splits.rem_split();" type="button" value="Remove split">
+            </div>
+
+            <div class="vlist">
+                <label> Split: </label>
+
+                <div class="vlist" id="split-entries" style="margin-bottom: 0.15em;">
+                </div>
+
+                <div class="hlist">
+                    <input onclick="reset_split();" id="reset-split" type="button" value="Reset split">
+                    <input onclick="add_split_el();" id="add-splits" type="button" value="+">
+                </div>
+            </div>
+
+            <div class="vlist">
+                <label for="split-name"> Upload: </label>
+                <div class="hlist">
+                    <label for="update-split"> <small> Update split? </small> </label>
+                    <input type="checkbox" id="update-split" name="update-split">
+                    <input type="text" id="split-name" name="split-name">
+                </div>
+                <input onclick="splits.save_split();" type="button" value="Save">
+            </div>
+        </div>
+    </body>
+</html>
