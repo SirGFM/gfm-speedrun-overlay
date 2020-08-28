@@ -9,8 +9,8 @@
 // GET requests should be used to retrieve/list data stored in the server.
 // These requests do not expect any data in the request body.
 //
-// Sending a GET without specifying a resource
-// (e.g., http://localhost:8080/splits) will retrieve the list of splits
+// Sending a GET with the path `list` (e.g.,
+// http://localhost:8080/splits/list) will retrieve the list of splits
 // stored in the server. The server willww reply with a JSON in the format:
 //
 //     {
@@ -35,6 +35,9 @@
 //             "entry n"
 //         ]
 //     }
+//
+// Alternatively, the public function `GetSplits()` may be used to retrieve
+// a specific entry programatically.
 //
 // ## POST & PUT
 //
