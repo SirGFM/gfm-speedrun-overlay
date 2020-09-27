@@ -5,6 +5,7 @@ package res
 
 import (
     "github.com/SirGFM/gfm-speedrun-overlay/logger"
+    "github.com/SirGFM/gfm-speedrun-overlay/common"
     srv_iface "github.com/SirGFM/gfm-speedrun-overlay/web/server/common"
     "net/http"
     "os"
@@ -203,19 +204,15 @@ func GetHandleFromConfig(srv srv_iface.Server, cfg Config) error {
     }
 
     // Get a list with possible resources
-    r.entryPoints = append(r.entryPoints, path.Join(cwd, "res"))
-
-    for _, s := range cfg.Dirs {
-        s = path.Clean(s)
-        fi, err := os.Stat(s)
-        if err != nil {
-            reason := "Failed to retrieve the directories under 'RES_DIR'"
-            return newError(err, reason, http.StatusInternalServerError)
-        } else if !fi.IsDir() {
-            reason := "Found a file within 'RES_DIR'"
-            return newError(err, reason, http.StatusInternalServerError)
-        }
-        r.entryPoints = append(r.entryPoints, s)
+    r.entryPoints, err = common.ListToAbsolutePath(nil, path.Join(cwd, "res"))
+    if err != nil {
+        reason := "Failed to create the list of resource directories"
+        return newError(err, reason, http.StatusInternalServerError)
+    }
+    r.entryPoints, err = common.ListToAbsolutePath(r.entryPoints, cfg.Dirs...)
+    if err != nil {
+        reason := "Failed to create the list of resource directories"
+        return newError(err, reason, http.StatusInternalServerError)
     }
     r.defaultPage = cfg.DefaultPage
     r.defaultExtension = cfg.DefaultExtension

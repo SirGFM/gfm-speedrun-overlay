@@ -13,6 +13,12 @@ const (
     ErrFlushTempFile
     // Couldn't replace the file atomically
     ErrAtomicReplaceFile
+    // Couldn't list the file's information
+    ErrStatFile
+    // The specified path does not name a directory
+    ErrNotDir
+    // Failed to retrieve the absolute path to the resource
+    ErrGetAbsPath
 )
 
 // An error associated to its possible cause (which may be nil).
@@ -33,6 +39,12 @@ func (we wrappedErr) Error() string {
         s = "common: Couldn't flush the temporary file"
     case ErrAtomicReplaceFile:
         s = "common: Couldn't replace the file atomically"
+    case ErrStatFile:
+        s = "common: Couldn't list the file's information"
+    case ErrNotDir:
+        s = "common: The specified path does not name a directory"
+    case ErrGetAbsPath:
+        s = "common: Failed to retrieve the absolute path to the resource"
     default:
         s = "common: Unknown"
     }
