@@ -1,0 +1,313 @@
+<html>
+    <head>
+        <title> MFH's MT Overlay </title>
+        <meta charset="utf-8" name="viewport" content="width=1280, height=720, initial-scale=1" />
+
+        <link rel="stylesheet" href="/res/style/common.css">
+        {{if .Is4Way}}
+            <link rel="stylesheet" href="/res/style/mt-2v2.css">
+        {{else}}
+            <link rel="stylesheet" href="/res/style/mt-1v1.css">
+        {{end}}
+
+        <script type="text/javascript" src="/res/script/conn.js"></script>
+        <script>
+            let boot_time = 0;
+            let did_update = function(e) {
+                try {
+                    let obj = JSON.parse(e);
+
+                    if (obj.Date > boot_time) {
+                        last_update = obj.Date;
+                        console.log('updated!');
+
+                        location.reload();
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            };
+
+            let timer_hour_hd = null;
+            let timer_hour_ld = null;
+            let timer_min_colon = null;
+            let timer_min_hd = null;
+            let timer_min_ld = null;
+            let timer_s_colon = null;
+            let timer_s_hd = null;
+            let timer_s_ld = null;
+            let timer_ms_hd = null;
+            let timer_ms_ld = null;
+            let get_timer = function(e) {
+                let res = JSON.parse(e);
+
+                // Ignored anything bellow centiseconds
+                res.Time = Math.trunc(res.Time / 10);
+
+                let ms = res.Time % 100;
+                res.Time = Math.trunc(res.Time / 100);
+                let ms_ld = ms % 10;
+                let ms_hd = Math.trunc(ms / 10);
+
+                let s = res.Time % 60;
+                res.Time = Math.trunc(res.Time / 60);
+                let s_ld = s % 10;
+                let s_hd = Math.trunc(s / 10);
+
+                let min = res.Time % 60;
+                res.Time = Math.trunc(res.Time / 60);
+                let min_ld = min % 10;
+                let min_hd = Math.trunc(min / 10);
+
+                let hour = res.Time % 24;
+                let hour_ld = hour % 10;
+                let hour_hd = Math.trunc(hour / 10);
+
+                timer_ms_ld.innerText = '' + ms_ld;
+                timer_ms_hd.innerText = '' + ms_hd;
+                timer_s_ld.innerText = '' + s_ld;
+                timer_s_hd.innerText = '' + s_hd;
+                timer_min_ld.innerText = '' + min_ld;
+                timer_min_hd.innerText = '' + min_hd;
+                timer_hour_ld.innerText = '' + hour_ld;
+                timer_hour_hd.innerText = '' + hour_hd;
+
+                if (min > 0 || s > 9 || hour > 0) {
+                    timer_s_hd.style.visibility = 'visible';
+                }
+                else {
+                    timer_s_hd.style.visibility = 'hidden';
+                }
+
+                if (min > 0 || hour > 0) {
+                    timer_s_colon.style.visibility = 'visible';
+                    timer_min_ld.style.visibility = 'visible';
+                }
+                else {
+                    timer_s_colon.style.visibility = 'hidden';
+                    timer_min_ld.style.visibility = 'hidden';
+                }
+
+                if (min > 9 || hour > 0) {
+                    timer_min_hd.style.visibility = 'visible';
+                }
+                else {
+                    timer_min_hd.style.visibility = 'hidden';
+                }
+
+                if (hour > 0) {
+                    timer_min_colon.style.visibility = 'visible';
+                    timer_hour_ld.style.visibility = 'visible';
+                }
+                else {
+                    timer_min_colon.style.visibility = 'hidden';
+                    timer_hour_ld.style.visibility = 'hidden';
+                }
+
+                if (hour > 9) {
+                    timer_hour_hd.style.visibility = 'visible';
+                }
+                else {
+                    timer_hour_hd.style.visibility = 'hidden';
+                }
+            }
+
+            let tp_pl = [];
+            let tp_stop_time = [];
+            let on_tangible_progress = function(e) {
+                let res = JSON.parse(e);
+
+                let stop = Date.now() + 3500;
+                for (var i = 0; i < tp_pl.length; i++) {
+                    if (res.TangibleProgress[i] && tp_pl[i]) {
+                        if (tp_pl[i].classList.contains('hidden')) {
+                            tp_pl[i].classList.remove('hidden');
+                        }
+                        tp_stop_time[i] = stop;
+                    }
+                }
+            };
+
+            let on_update = function() {
+                try {
+                    {{if .AutoUpdate}}
+                        conn.getData('/mt-server/last-update', did_update);
+                    {{end}}
+                    {{if .UseTimer}}
+                        conn.getData('/timer', get_timer);
+                    {{end}}
+                    {{if .UseTangibleProgress}}
+                        conn.getData('/mt-server/tp', on_tangible_progress);
+                    {{end}}
+                } catch (e) {
+                    console.log(e);
+                }
+
+                let now = Date.now();
+                for (var i = 0; i < tp_stop_time.length; i++) {
+                    if (tp_stop_time[i] && tp_stop_time[i] < now) {
+                        if (!tp_pl[i].classList.contains('hidden')) {
+                            tp_pl[i].classList.add('hidden');
+                        }
+                        tp_stop_time[i] = null;
+                    }
+                }
+            };
+
+            document.addEventListener("DOMContentLoaded", function (event) {
+                boot_time = Date.now();
+                timer_obj = document.getElementById('timer');
+                timer_hour_hd = document.getElementById('hour-hd');
+                timer_hour_ld = document.getElementById('hour-ld');
+                timer_min_colon = document.getElementById('min-colon');
+                timer_min_hd = document.getElementById('min-hd');
+                timer_min_ld = document.getElementById('min-ld');
+                timer_s_colon = document.getElementById('s-colon');
+                timer_s_hd = document.getElementById('s-hd');
+                timer_s_ld = document.getElementById('s-ld');
+                timer_ms_hd = document.getElementById('ms-hd');
+                timer_ms_ld = document.getElementById('ms-ld');
+
+                tp_pl.push(document.getElementById('pl1-tp'));
+                tp_pl.push(document.getElementById('pl2-tp'));
+                tp_pl.push(document.getElementById('pl3-tp'));
+                tp_pl.push(document.getElementById('pl4-tp'));
+                tp_stop_time.push(null);
+                tp_stop_time.push(null);
+                tp_stop_time.push(null);
+                tp_stop_time.push(null);
+
+                {{if or .AutoUpdate .UseTimer .UseTangibleProgress}}
+                    window.setInterval(on_update, 80);
+                {{end}}
+            });
+        </script>
+    </head>
+    <body>
+        <!-- Empty div used so others may compute their length more easily -->
+        <div id='empty' style='width: 0; height: 0;'> </div>
+        <div id='view' style='width: 1280; height: 720;'>
+            <div id='top' class='player'>
+                <div id='top-pl-1' class='player-flex'>
+                    <p id='pl1-name' class='mt-font player-flex center-label'>
+                        {{.Top.Player1.Name}}
+                    </p>
+                    {{if not .Is4Way}}
+                        <p id='pl1-predictions' class='mt-font predictions-flex center-label'>
+                            {{.Top.Player1.Predictions}}%
+                        </p>
+                        <div id='top-left-padding' class='top-padding'> </div>
+                    {{end}}
+                </div>
+                {{if .Is4Way}}
+                    <p id='top-round' class='mt-font round center-label'>
+                        {{.Top.Round}}
+                    </p>
+                {{end}}
+                <div id='top-pl-2' class='player-flex'>
+                    {{if not .Is4Way}}
+                        <div id='top-right-padding' class='top-padding'> </div>
+                        <p id='pl2-predictions' class='mt-font predictions-flex center-label'>
+                            {{.Top.Player2.Predictions}}%
+                        </p>
+                    {{end}}
+                    <p id='pl2-name' class='mt-font player-flex center-label'>
+                        {{.Top.Player2.Name}}
+                    </p>
+                </div>
+            </div>
+            {{if .Is4Way}}
+            <div id='bottom' class='player'>
+                <div id='top-pl-3' class='player-flex'>
+                    <p id='pl3-name' class='mt-font player-flex center-label'>
+                        {{.Bottom.Player1.Name}}
+                    </p>
+                </div>
+                <p id='bottom-round' class='mt-font round center-label'>
+                    {{.Bottom.Round}}
+                </p>
+                <div id='top-pl-4' class='player-flex'>
+                    <p id='pl4-name' class='mt-font player-flex center-label'>
+                        {{.Bottom.Player2.Name}}
+                    </p>
+                </div>
+            </div>
+            {{end}}
+
+            <div id='info' class='info'>
+                {{if not .Is4Way}}
+                    <p id='round' class='mt-font'>
+                        {{.Top.Round}}
+                    </p>
+                {{end}}
+                {{if not .Is4Way}}
+                <div id='left-info' class='info-box'>
+                {{end}}
+                    <p id='game' class='mt-font info'>
+                        {{.Game}}
+                    </p>
+                    <p id='goal' class='mt-font info'>
+                        {{.Goal}}
+                    </p>
+                {{if not .Is4Way}}
+                </div>
+                <div id='info-padding' class='info-box'> </div>
+                <div id='right-info' class='info-box'>
+                {{end}}
+                    <p id='platform' class='mt-font info'>
+                        {{.Platform}}
+                    </p>
+                    <p id='subbed-by' class='mt-font info'>
+                        Submitted By: </br>
+                        {{.SubbedBy}}
+                    </p>
+                {{if not .Is4Way}}
+                    <div id='right-info-padding' class='info-box'> </div>
+                </div>
+                {{end}}
+            </div>
+
+            <img id='logo' src='/res/img/mt15logo.png'>
+            {{if .Top.Player1.Won}}
+                <img id='top-pl1-win' class='win' src='/res/img/Winner1.png'>
+            {{end}}
+            {{if .Top.Player2.Won}}
+                <img id='top-pl2-win' class='win' src='/res/img/Winner2.png'>
+            {{end}}
+            {{if .Is4Way}}
+                {{if .Bottom.Player1.Won}}
+                    <img id='top-pl3-win' class='win' src='/res/img/Winner3.png'>
+                {{end}}
+                {{if .Bottom.Player2.Won}}
+                    <img id='top-pl4-win' class='win' src='/res/img/Winner4.png'>
+                {{end}}
+            {{end}}
+            <img id='ghost' src='/res/img/Mystery Ghost.png'>
+
+            {{if .UseTangibleProgress}}
+                <img class='tangible-progress pixelated hidden' id='pl1-tp' src='/res/img/tp.gif'>
+                <img class='tangible-progress pixelated hidden' id='pl2-tp' src='/res/img/tp.gif'>
+                {{if .Is4Way}}
+                <img class='tangible-progress pixelated hidden' id='pl3-tp' src='/res/img/tp.gif'>
+                <img class='tangible-progress pixelated hidden' id='pl4-tp' src='/res/img/tp.gif'>
+                {{end}}
+            {{end}}
+
+            {{if .UseTimer}}
+                <div class='timer'>
+                    <span style='visibility: hidden' class='timer' id='hour-hd'>0</span>
+                    <span style='visibility: hidden' class='timer' id='hour-ld'>0</span>
+                    <span style='visibility: hidden' class='timer timer-sep' id='min-colon'>:</span>
+                    <span style='visibility: hidden' class='timer' id='min-hd'>0</span>
+                    <span style='visibility: hidden' class='timer' id='min-ld'>0</span>
+                    <span style='visibility: hidden' class='timer timer-sep' id='s-colon'>:</span>
+                    <span style='visibility: hidden' class='timer' id='s-hd'>0</span>
+                    <span class='timer' id='s-ld'>0</span>
+                    <span class='timer timer-small timer-small-sep' id='ms-dot'>.</span>
+                    <span class='timer timer-small' id='ms-hd'>0</span>
+                    <span class='timer timer-small' id='ms-ld'>0</span>
+                </div>
+            {{end}}
+        </div>
+    </body>
+</html>

@@ -1,0 +1,138 @@
+body {
+    background: url('/res/img/MT15 Layout 4p.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/* === GAME PART ============================================================ */
+
+/* Div that spans the entire names-row */
+div.player {
+    width: 896px;
+    height: 26px;
+    right: 0;
+    display: flex;
+    justify-content: space-between; /* left at the start, right at the end, space rest */
+}
+div#bottom {
+    bottom: 0;
+}
+
+/* Div with the name and predictions of a single player */
+div.player-flex {
+    display: inline-flex;
+    width: 380px;
+    height: 100%;
+    position: relative;
+}
+
+/* Magically center labels */
+p.center-label {
+    height: 26px;
+    line-height: 26px;
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* Properly position player labels */
+p.player-flex {
+    margin-left: 4px;
+    margin-right: 4px;
+    width: 100%;
+    position: relative;
+    font-size: 20px;
+}
+p#pl2-name, p#pl4-name {
+    text-align: end;
+}
+
+/* Center the round withing its parent */
+p.round {
+    font-size: 22px;
+    position: relative;
+}
+
+/* === LEFT PART =========================================================== */
+
+div#info {
+    position: absolute;
+    width: 384px;
+    height: 605px;
+    top: 115px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+p.info {
+    position: relative;
+    margin: 0;
+    margin-bottom: 2px;
+    text-align: center;
+}
+p#game {
+    font-size: 30px;
+}
+p#goal {
+    font-size: 28px;
+}
+p#platform {
+    font-size: 28px;
+}
+p#subbed-by {
+    font-size: 22px;
+}
+
+img#logo {
+    left: 0;
+    top: 0;
+    height: 100px;
+}
+img#ghost {
+    left: 244px;
+    top: 0;
+}
+img.win {
+    width: 896px;
+    height: 108px;
+}
+img#top-pl1-win {
+    right: 52px;
+    bottom: 340px;
+}
+img#top-pl2-win {
+    right: -40px;
+    bottom: 340px;
+    height: 100px;
+}
+img#top-pl3-win {
+    right: 50px;
+    bottom: 274px;
+}
+img#top-pl4-win {
+    right: -40px;
+    bottom: 278px;
+    height: 100px;
+}
+
+div.timer {
+    left: 0;
+}
+
+img#pl1-tp {
+    left: 461px;
+    top: 106px;
+}
+img#pl2-tp {
+    left: 911px;
+    top: 106px;
+}
+img#pl3-tp {
+    left: 461px;
+    top: 445px;
+}
+img#pl4-tp {
+    left: 911px;
+    top: 445px;
+}

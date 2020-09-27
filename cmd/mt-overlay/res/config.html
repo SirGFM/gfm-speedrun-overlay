@@ -1,0 +1,316 @@
+<html>
+    <head>
+        <title> MFH's MT Overlay Configuration </title>
+        <meta charset="utf-8" name="viewport" />
+
+        <style>
+            body {
+                padding-left: 10%;
+                padding-right: 10%;
+                font-size: x-large;
+            }
+            div.hor {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                margin-bottom: 0.5em;
+            }
+
+            div.vert {
+                display: flex;
+                flex-direction: column;
+            }
+
+            label {
+                flex-grow: 1;
+            }
+            input {
+                flex-grow: 9;
+                font-size: large;
+            }
+            input.pred {
+                flex-grow: 1;
+                margin-left: 1em;
+                margin-right: 1em;
+            }
+        </style>
+
+        <!--
+          - Having a multiple, named styles allows to retrieve it, and then
+          - disable/re-enable it from Javascript, from `document.styleSheets`.
+          -->
+        <style title='toggle_doubles_visibility'>
+            .hidden_doubles {
+                visibility: hidden;
+                height: 0;
+                margin-bottom: 0;
+            }
+        </style>
+
+        <script type="text/javascript" src="/res/script/conn.js"></script>
+        <script>
+        let toggle_visibility = function(e, style) {
+            if (!('checked' in e)) {
+                return;
+            }
+            for(let i = 0; i < document.styleSheets.length; i++) {
+                if (document.styleSheets[i].title == style) {
+                    document.styleSheets[i].disabled = e.checked;
+                    return;
+                }
+            }
+        }
+
+        let get_val = function(id) {
+            let text_field = document.getElementById(id);
+            return text_field.value;
+        }
+
+        let on_save = function(e) {
+            if (!e) {
+                alert('Match updated successfully!');
+            }
+            else {
+                alert(e);
+            }
+        }
+
+        let submit = function() {
+            let TopPlayer1 = get_val('top-pl1');
+            let TopPlayer2 = get_val('top-pl2');
+            let TopRound = get_val('top-round');
+            let TopPredictions = get_val('top-left-pred');
+            let BottomPlayer1 = get_val('bot-pl1');
+            let BottomPlayer2 = get_val('bot-pl2');
+            let BottomRound = get_val('bot-round');
+            let BottomPredictions = get_val('bot-left-pred');
+            let Game = get_val('game');
+            let Goal = get_val('goal');
+            let Platform = get_val('platform');
+            let SubmittedBy = get_val('subbed-by');
+            let Doubles = document.getElementById('tg_doubles').checked;
+            let AutoUpdate = document.getElementById('auto-update').checked;
+            let UseTimer = document.getElementById('has-timer').checked;
+            let UseTangibleProgress = document.getElementById('has-tp').checked;
+
+            let data = {
+                'Top': {
+                    'Player1': {
+                        'Name': TopPlayer1,
+                    },
+                    'Player2': {
+                        'Name': TopPlayer2,
+                    },
+                    'Predictions': TopPredictions,
+                    'Round': TopRound,
+                },
+                'Bottom': {
+                    'Player1': {
+                        'Name': BottomPlayer1,
+                    },
+                    'Player2': {
+                        'Name': BottomPlayer2,
+                    },
+                    'Predictions': BottomPredictions,
+                    'Round': BottomRound,
+                },
+                'Game': Game,
+                'Goal': Goal,
+                'Platform': Platform,
+                'SubbedBy': SubmittedBy,
+                'Is4Way': Doubles,
+                'AutoUpdate': AutoUpdate,
+                'UseTimer': UseTimer,
+                'UseTangibleProgress': UseTangibleProgress,
+            };
+
+            data = JSON.stringify(data);
+            conn.sendData('/tmpl/index.go.html', data, on_save);
+        }
+
+        let set_pred = function(pos, val) {
+            let left_pl = document.getElementById(pos+'-left-pred');
+            let right_pl = document.getElementById(pos+'-right-pred');
+            let pred = document.getElementById(pos+'-pred');
+
+            left_pl.value = 100 - val;
+            right_pl.value = val;
+            pred.value = val;
+        }
+        </script>
+    </head>
+    <body>
+        <div class='vert'>
+            <h1> MFH's MT Overlay Configuration </h1>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='top-pl1'> Player 1: </label>
+                    <input type='text' id='top-pl1' name='top-pl1'>
+                </div>
+            </div>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='pl1-pred'> Player 1 (%) </label>
+                    <input id='top-left-pred'
+                           class='pred'
+                           name='top-left-pred'
+                           type='number'
+                           max='100'
+                           min='0'
+                           value='50'
+                           step='1'
+                           source='[name=top-pred]'
+                           onchange='set_pred("top", 100-this.value);'>
+                    <input id='top-pred'
+                           name='top-pred'
+                           type='range'
+                           max='100'
+                           min='0'
+                           value='50'
+                           step='1'
+                           onchange='set_pred("top", this.value);'>
+                    <input id='top-right-pred'
+                           class='pred'
+                           name='top-right-pred'
+                           type='number'
+                           max='100'
+                           min='0'
+                           value='50'
+                           step='1'
+                           source='[name=top-pred]'
+                           onchange='set_pred("top", this.value);'>
+                    <label for='pl2-pred'> Player 2 (%) </label>
+                </div>
+            </div>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='top-pl2'> Player 2: </label>
+                    <input type='text' id='top-pl2' name='top-pl2'>
+                </div>
+            </div>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='top-round'> Round: </label>
+                    <input type='text' id='top-round' name='top-round'>
+                </div>
+            </div>
+
+            <div class='hor'>
+                <div class='vert' style='flex-grow: 1; align-items: center;'>
+                    <label for='tg_doubles'> Doubles </label>
+                    <input onclick='toggle_visibility(this, "toggle_doubles_visibility");' type='checkbox' id='tg_doubles' name='tg_doubles'>
+                </div>
+                <div class='vert hidden_doubles' style='flex-grow: 9;'>
+                    <h3> Bottom match </h3>
+                        <div class='vert'>
+                            <div class='hor'>
+                                <label for='bot-pl1'> Player 3: </label>
+                                <input type='text' id='bot-pl1' name='bot-pl1'>
+                            </div>
+                        </div>
+                        <div class='vert'>
+                            <div class='hor'>
+                                <label for='pl3-pred'> Player 3 (%) </label>
+                                <input id='bot-left-pred'
+                                       class='pred'
+                                       name='bot-left-pred'
+                                       type='number'
+                                       max='100'
+                                       min='0'
+                                       value='50'
+                                       step='1'
+                                       source='[name=bot-pred]'
+                                       onchange='set_pred("bot", 100-this.value);'>
+                                <input id='bot-pred'
+                                       name='bot-pred'
+                                       type='range'
+                                       max='100'
+                                       min='0'
+                                       value='50'
+                                       step='1'
+                                       onchange='set_pred("bot", this.value);'>
+                                <input id='bot-right-pred'
+                                       class='pred'
+                                       name='bot-right-pred'
+                                       type='number'
+                                       max='100'
+                                       min='0'
+                                       value='50'
+                                       step='1'
+                                       source='[name=bot-pred]'
+                                       onchange='set_pred("bot", this.value);'>
+                                <label for='pl4-pred'> Player 4 (%) </label>
+                            </div>
+                        </div>
+                        <div class='vert'>
+                            <div class='hor'>
+                                <label for='bot-pl2'> Player 4: </label>
+                                <input type='text' id='bot-pl2' name='bot-pl2'>
+                            </div>
+                        </div>
+                        <div class='vert'>
+                            <div class='hor'>
+                                <label for='bot-round'> Round: </label>
+                                <input type='text' id='bot-round' name='bot-round'>
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='game'> Game: </label>
+                    <input type='text' id='game' name='game'>
+                </div>
+            </div>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='goal'> Goal: </label>
+                    <input type='text' id='goal' name='goal'>
+                </div>
+            </div>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='platform'> Platform: </label>
+                    <input type='text' id='platform' name='platform'>
+                </div>
+            </div>
+
+            <div class='vert'>
+                <div class='hor'>
+                    <label for='subbed-by'> Submitted by: </label>
+                    <input type='text' id='subbed-by' name='subbed-by'>
+                </div>
+            </div>
+
+            <div class='vert' style='flex-grow: 1; align-items: center;'>
+                <div class='hor'>
+                    <label for='auto-update'> Auto-update </label>
+                    <input type='checkbox' id='auto-update' name='auto-update'>
+                </div>
+            </div>
+
+            <div class='vert' style='flex-grow: 1; align-items: center;'>
+                <div class='hor'>
+                    <label for='has-timer'> Use built-in timer </label>
+                    <input type='checkbox' id='has-timer' name='has-timer'>
+                </div>
+            </div>
+
+            <div class='vert' style='flex-grow: 1; align-items: center;'>
+                <div class='hor'>
+                    <label for='has-tp'> Enable "Tangible Progress" button </label>
+                    <input type='checkbox' id='has-tp' name='has-tp'>
+                </div>
+            </div>
+
+            <input style='flex-grow: 1;' onclick="submit();" type="button" value="Update">
+        </div>
+    </body>
+</html>

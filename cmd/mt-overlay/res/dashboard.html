@@ -1,0 +1,186 @@
+<html>
+    <head>
+        <title> MFH's MT Simplified Dashboard </title>
+        <meta charset="utf-8" name="viewport" />
+
+        <style>
+            body {
+                padding-left: 10%;
+                padding-right: 10%;
+                font-size: large;
+            }
+            h1, h2 {
+                text-align: center;
+            }
+
+            div {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            div.hor {
+                flex-direction: row;
+                flex-grow: 1;
+            }
+            div#dashboard {
+                flex-grow: 9;
+            }
+            div.vert {
+                flex-direction: column;
+                flex-grow: 1;
+            }
+
+            div.menu {
+                margin: 0.5em;
+                border: solid;
+                padding: 1em;
+            }
+
+            div.sub-view {
+                margin: 0.1em;
+            }
+
+            div.hor-no {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                margin-bottom: 0.5em;
+                flex-grow: 3;
+            }
+
+            div.vert-no {
+                height: 90%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            input {
+                margin: 0.1em;
+                margin-left: 0.25em;
+                margin-right: 0.25em;
+                flex-grow: 1;
+                font-size: large;
+                height: 50px;
+            }
+            input.menu {
+                font-size: medium;;
+                height: 35px;
+            }
+
+            .hidden {
+                visibility: hidden;
+                display: none;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                width: 0;
+                height: 0;
+            }
+            .hor-flip {
+                -moz-transform: scale(-1, 1);
+                -webkit-transform: scale(-1, 1);
+                -o-transform: scale(-1, 1);
+                -ms-transform: scale(-1, 1);
+                transform: scale(-1, 1);
+                display: inline-block;
+            }
+        </style>
+
+        <script type="text/javascript" src="/res/script/conn.js"></script>
+        <script>
+        let get_val = function(id) {
+            let text_field = document.getElementById(id);
+            return text_field.value;
+        }
+
+        let on_save = function(e) {
+            if (!e) {
+                console.log('Match updated successfully!');
+            }
+            else {
+                alert(e);
+            }
+        }
+
+        let submit = function(player) {
+            conn.sendData('/tmpl/'+player, null, on_save);
+        }
+
+        let timer = function(action) {
+            let req = {
+                'Action': action,
+            };
+            req = JSON.stringify(req);
+
+            conn.sendData('/timer', req, on_save, 'POST');
+        }
+
+        let toggle_visibility = function(id) {
+            let el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            }
+            else {
+                el.classList.add('hidden');
+            }
+        }
+        </script>
+    </head>
+    <body>
+        <div class='vert'>
+            <h1> MFH's MT Simplified Dashboard </h1>
+
+            <div class='vert'>
+                <div id='menu' class='hor'>
+                    <input class='menu' onclick="toggle_visibility('timer');" type="button" value="⏱️ Timer">
+                    <input class='menu' onclick="toggle_visibility('top-win');" type="button" value="🏁 Top Winner">
+                    <input class='menu' onclick="toggle_visibility('bot-win');" type="button" value="🏁 Bottom Winner">
+                    <input class='menu hidden' onclick="toggle_visibility('audio');" type="button" value="Audio">
+                    <input class='menu' onclick="toggle_visibility('tg-prog');" type="button" value="🌈 Tang. Prog.">
+                </div>
+                <div id='dashboard' class='hor'>
+                    <div id='timer' class='vert menu hidden'>
+                        <h2> ⏱️ Timer ⏱️ </h2>
+
+                        <div class='hor'>
+                            <input onclick="timer('stop');" type="button" value="Stop Timer">
+                            <input onclick="timer('reset');" type="button" value="Reset Timer">
+                            <input onclick="timer('start');" type="button" value="Start Timer">
+                        </div>
+                    </div>
+                    <div id='top-win' class='vert menu hidden'>
+                        <h2> 🏁 Top Race / 1v1 <span class='hor-flip'>🏁</span> </h2>
+
+                        <div class='hor'>
+                            <input onclick="submit('top-win/player1');" type="button" value="Player 1 wins">
+                            <input onclick="submit('top-win/none');" type="button" value="Reset winner">
+                            <input onclick="submit('top-win/player2');" type="button" value="Player 2 wins">
+                        </div>
+                    </div>
+                    <div id='bot-win' class='vert menu hidden'>
+                        <h2> 🏁 Bottom Race <span class='hor-flip'>🏁</span> </h2>
+
+                        <div class='hor'>
+                            <input onclick="submit('bottom-win/player1');" type="button" value="Player 3 wins">
+                            <input onclick="submit('bottom-win/none');" type="button" value="Reset winner">
+                            <input onclick="submit('bottom-win/player2');" type="button" value="Player 4 wins">
+                        </div>
+                    </div>
+                    <div id='tg-prog' class='vert menu hidden'>
+                        <h2> 🌈 Tangible Progress <span class='hor-flip'>🌈</span> </h2>
+
+                        <div class='vert'>
+                            <div class='hor sub-view'>
+                                <input onclick="submit('tp/player1');" type="button" value="Player 1">
+                                <input onclick="submit('tp/player2');" type="button" value="Player 2">
+                            </div>
+                            <div class='hor sub-view'>
+                                <input onclick="submit('tp/player3');" type="button" value="Player 3">
+                                <input onclick="submit('tp/player4');" type="button" value="Player 4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
