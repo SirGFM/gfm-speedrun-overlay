@@ -19,6 +19,10 @@ const (
     ErrNotDir
     // Failed to retrieve the absolute path to the resource
     ErrGetAbsPath
+    // The specified path names a directory, and not a regular file
+    ErrDir
+    // Couldn't open the requested file
+    ErrOpenFile
 )
 
 // An error associated to its possible cause (which may be nil).
@@ -45,6 +49,10 @@ func (we wrappedErr) Error() string {
         s = "common: The specified path does not name a directory"
     case ErrGetAbsPath:
         s = "common: Failed to retrieve the absolute path to the resource"
+    case ErrDir:
+        s = "common: The specified path names a directory, and not a regular file"
+    case ErrOpenFile:
+        s = "common: Couldn't open the requested file"
     default:
         s = "common: Unknown"
     }

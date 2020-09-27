@@ -4,7 +4,6 @@
 package res
 
 import (
-    "github.com/SirGFM/gfm-speedrun-overlay/logger"
     "github.com/SirGFM/gfm-speedrun-overlay/common"
     srv_iface "github.com/SirGFM/gfm-speedrun-overlay/web/server/common"
     "net/http"
@@ -40,57 +39,6 @@ func (*res) Dependencies() []string {
     return nil
 }
 
-// Check if the given file exists in the directory, retrieve it and its
-// content type.
-func getFile(dir, filePath string) (*os.File, string, error) {
-    filePath = path.Join(dir, filePath)
-
-    file, err := os.Open(filePath)
-    if err != nil {
-        // Don't do any further post-processing
-    } else if fi, err := file.Stat(); err != nil {
-        reason := "Couldn't check the file's metadata"
-        err = newError(err, reason, http.StatusInternalServerError)
-    } else if fi.IsDir() {
-        reason := "Trying to request a directory"
-        err = newError(nil, reason, http.StatusBadRequest)
-    }
-
-    if err != nil {
-        return nil, "", err
-    }
-
-    var ctype string
-    switch ext := path.Ext(filePath); ext {
-    case ".json":
-        ctype = "application/json"
-    case ".css":
-        ctype = "text/css"
-    case ".html":
-        ctype = "text/html"
-    case ".js":
-        ctype = "text/javascript"
-    case ".bmp":
-        ctype = "image/bmp"
-    case ".gif":
-        ctype = "image/gif"
-    case ".ico":
-        ctype = "image/x-icon"
-    case ".jpeg", ".jpg":
-        ctype = "image/jpeg"
-    case ".png":
-        ctype = "image/png"
-    case ".svg":
-        ctype = "image/svg+xml"
-    default:
-        logger.Warnf("web/res: Unknown file extension: %+s", ext)
-        ctype = "text/plain"
-    }
-
-    logger.Debugf("web/res: GET [%s] %s...", ctype, filePath)
-    return file, ctype, nil
-}
-
 // Pack data required to handle a request
 type fileRequest struct {
     // The requesting server
@@ -107,7 +55,7 @@ type fileRequest struct {
 func (ctx fileRequest) serveFile() bool {
     // Server the file if it's in any of the listed directories
     for _, dir := range ctx.r.entryPoints {
-        if f, ctype, err := getFile(dir, ctx.filePath); err == nil {
+        if f, ctype, err := common.OpenFile(dir, ctx.filePath); err == nil {
             defer f.Close()
 
             var modtime time.Time
