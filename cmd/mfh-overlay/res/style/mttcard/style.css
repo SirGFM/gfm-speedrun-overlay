@@ -1,0 +1,62 @@
+html {
+    background-color: rgba(0, 0, 0, 0);
+    width: 515px;
+    height: 515px;
+}
+
+html, body {
+    margin: 0px auto;
+    overflow: hidden;
+}
+
+body {
+    background: url('/res/img/racer-card.png');
+    background-repeat: no-repeat;
+    width: 475px;
+    height: 475px;
+    padding: 20px;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: sans-serif;
+    line-height: 1.6;
+    text-shadow: 2px 2px darkblue;
+}
+
+.channel {
+    font-size: small;
+    margin: 1em;
+    margin-bottom: 2em;
+    margin-top: 0.5em;
+    display: block;
+    width: auto;
+    text-align: right;
+}
+
+.user {
+    margin: 1.5em;
+}
+
+.avatar {
+    width: 100px;
+    float: left;
+}
+
+.username {
+    font-size: xx-large;
+    vertical-align: middle;
+    line-height: 100px;
+    margin-left: 0.5em;
+}
+
+.stats {
+    margin: 1.5em;
+    width: 95%;
+}
+
+.stats_label {
+    width: 70%;
+}
+
+.stats_field {
+}

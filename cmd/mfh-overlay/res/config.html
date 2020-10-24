@@ -129,6 +129,41 @@
             send_with_errors(`/tmpl/pl${pl_idx}-twitch-iframe.go.html`, data);
         }
 
+        /**
+         * Send the data associated with the players' SRL pages.
+         *
+         * This data is stored in the extra data, possibly along-side even
+         * more info.
+         *
+         * Also, this function does nothing if the SRL fields are empty!
+         */
+        let send_srl_data = function() {
+            pl1_srl = get_val('pl1-srl');
+            pl2_srl = get_val('pl2-srl');
+            if (!pl1_srl && !pl2_srl) {
+                return;
+            }
+
+            try {
+                let _on_load_srl = function(e) {
+                    let data = {};
+                    if (e) {
+                        data = JSON.parse(e);
+                    }
+
+                    data.Player1SRL = pl1_srl;
+                    data.Player2SRL = pl2_srl;
+
+                    data = JSON.stringify(data);
+                    conn.sendData('/mfh-handler/overlay-extras', data, function(e){}, 'POST');
+                };
+
+                conn.getData('/mfh-handler/overlay-extras', _on_load_srl);
+            } catch (e) {
+                alert(`Could not get current extra data for the SRL page: ${e}`);
+            }
+        }
+
         let submit = function() {
             let data = {};
 
@@ -171,6 +206,7 @@
             send_twitch_data(2);
             send_twitch_data(3);
             send_twitch_data(4);
+            send_srl_data();
         }
 
         let set_pred = function(pos, val) {
@@ -276,6 +312,34 @@
         }
 
         /**
+         * Load the data associated with the player's SRL page.
+         *
+         * This data is stored in the extra data, possibly along-side even
+         * more info.
+         */
+        let load_srl_data = function() {
+            try {
+                let _on_load_srl = function(e) {
+                    let data = {};
+                    if (e) {
+                        data = JSON.parse(e);
+                    }
+
+                    if ('Player1SRL' in data) {
+                        set_val('pl1-srl', data.Player1SRL);
+                    }
+                    if ('Player2SRL' in data) {
+                        set_val('pl2-srl', data.Player2SRL);
+                    }
+                };
+
+                conn.getData('/mfh-handler/overlay-extras', _on_load_srl);
+            } catch (e) {
+                alert(`Could not get current extra data for the SRL page: ${e}`);
+            }
+        }
+
+        /**
          * Request the data currently in the server, and fill the fields
          * if possible.
          */
@@ -292,6 +356,7 @@
             load_twitch_data(2);
             load_twitch_data(3);
             load_twitch_data(4);
+            load_srl_data();
         }
 
         /**
@@ -348,6 +413,11 @@
                     <input type='text' id='pl1-twitch' name='pl1-twitch'>
                 </div>
                 <div class='hor'>
+                    <label for='pl1-srl'> SRL Name: </label>
+                    <input type='text' id='pl1-srl' name='pl1-srl'>
+                    <label> (for the title card) </label>
+                </div>
+                <div class='hor'>
                     <input class='checkbox' type='checkbox' id='pl1-audio' name='has-popup'>
                     <label class='checkbox' for='pl1-audio'> Show audio indicator </label>
                 </div>
@@ -367,6 +437,11 @@
                 <div class='hor'>
                     <label for='pl2-twitch'> Twitch channel: </label>
                     <input type='text' id='pl2-twitch' name='pl2-twitch'>
+                </div>
+                <div class='hor'>
+                    <label for='pl2-srl'> SRL Name: </label>
+                    <input type='text' id='pl2-srl' name='pl2-srl'>
+                    <label> (for the title card) </label>
                 </div>
                 <div class='hor'>
                     <input class='checkbox' type='checkbox' id='pl2-audio' name='has-popup'>

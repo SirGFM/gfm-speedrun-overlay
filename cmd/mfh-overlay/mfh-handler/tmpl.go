@@ -96,6 +96,37 @@ func addCustomFields(data interface{}, fields []customField) (interface{}, error
     return val.Interface(), nil
 }
 
+// Retrieve the data associated with a given MT title-card.
+func (ctx *serverContext) getMTTCard(resource string) (interface{}, error) {
+    var exp string
+
+    if resource == "pl1-mttcard.go.html" {
+        exp = "Player1SRL"
+    } else if resource == "pl2-mttcard.go.html" {
+        exp = "Player2SRL"
+    } else {
+        logger.Errorf("mfh-handler: Invalid title card page '%s'", resource)
+        return nil, ExtraBadTitleCard
+    }
+
+    fields := ctx.getExtraData(nil)
+    ctx.unlockExtraData()
+
+    // Manually look through everything stored in the extra data
+    // and retrieve only the expected field, in the format that
+    // '/tmpl/mttcard.go.html' needs.
+    for _, f := range fields {
+        if f.key == exp {
+            data := struct { PlayerSRL interface{} } {
+                PlayerSRL: f.val,
+            }
+            return &data, nil
+        }
+    }
+
+    return nil, ExtraBadTitleCard
+}
+
 // Retrieve the data associated with a given resource.
 func (ctx *serverContext) Read(resource []string) (interface{}, error) {
     var customFields []customField
@@ -124,6 +155,8 @@ func (ctx *serverContext) Read(resource []string) (interface{}, error) {
 
             lastPart := resource[1][4:]
             resource = []string{"tmpl", lastPart}
+        } else if strings.HasSuffix(resource[1], "mttcard.go.html") {
+            return ctx.getMTTCard(resource[1])
         }
     }
 
@@ -174,6 +207,8 @@ func (ctx *serverContext) Map(resource []string) ([]string, error) {
     if len(resource) == 2 && resource[0] == "tmpl" {
         if strings.HasSuffix(resource[1], "twitch-iframe.go.html") {
             return []string{"tmpl", "twitch-iframe.go.html"}, nil
+        } else if strings.HasSuffix(resource[1], "mttcard.go.html") {
+            return []string{"tmpl", "mttcard.go.html"}, nil
         } else if strings.HasPrefix(resource[1], "1v1-") || strings.HasPrefix(resource[1], "2v2-") {
             lastPart := resource[1][4:]
             return []string{"tmpl", lastPart}, nil

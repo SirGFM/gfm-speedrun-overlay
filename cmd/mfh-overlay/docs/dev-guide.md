@@ -104,3 +104,19 @@ Resource: `tmpl/<identifier>twitch-iframe.go.html`
 One of the template's pages. This page allows configuring the twitch channel to be accessed, as well as the stream's resolution. By using different identifiers for each player on OBS (say, `pl1-twitch-iframe.go.html`, `pl2-twitch-iframe.go.html` etc), it's possible to automatically change the source without having to manually change the Browser Source.
 
 This page must be configured with an object with a `TwitchUsername` field, the channel's name (so, for `https://www.twitch.tv/mysteryfunhouse` it would be only `mysteryfunhouse`), and two optional dimentions, on fields `Width` and `Height`. If not specified, the dimensions default to 852x480.
+
+### Mystery Tournament Career title card page
+
+Resource: `tmpl/pl<num>-mttcard.go.html`
+
+Another of the template pages. This pages allows easily retrieving a racer's title card. Since this is only intended to be used when simple 1v1 racer, it only accepts two possible URLs: `tmpl/pl1-mttcard.go.html` and `tmpl/pl2-mttcard.go.html`. The server will look through its extra data for the field `Player1SRL` or `Player2SRL`, respectively, and map the field required by the requested page into an object with a single field `PlayerSRL`.
+
+A page with both racers may be accessed on `http://localhost:8088/res/racer-cards.html`.
+
+## Mystery Tournament Career title card
+
+Handle/entry-point: `mttcard/<srl-user>`
+
+Simple port of my [MT Title Card](https://github.com/SirGFM/MTTitleCard) into the interface required by this system.
+
+This module retrieve's the racing stats for a given [SpeedRunsLive](https://www.speedrunslive.com/) user both from the site as from the "Mystery Tournament Careers" spreadsheet, organizing in a simple HTML page. The title card style may be customized by editing `res/style/mttcard/style.css`.

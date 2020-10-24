@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <title> Racer cards </title>
+        <meta
+            charset="utf-8"
+            name="viewport"
+            content="width=1280, height=720, initial-scale=1" />
+        <style>
+            html, body {
+                width: 1280px;
+                height: 720px;
+                margin: 0;
+                padding: 0;
+                border: none;
+                overflow: hidden;
+            }
+            body {
+                background-color: #00000000;
+            }
+            iframe {
+                position: absolute;
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+            iframe.pl1 {
+                top: 140px;
+                left: 65px;
+            }
+            iframe.pl2 {
+                top: 140px;
+                left: 700px;
+            }
+            img.ghost {
+                position: absolute;
+                object-fit: contain;
+                width: 1280px;
+                height: 120px;
+                top: 526px;
+            }
+        </style>
+    </head>
+    <body>
+        <iframe class='pl1'
+            src="/tmpl/pl1-mttcard.go.html"
+            width="515"
+            height="515">
+        </iframe>
+
+        <iframe class='pl2'
+            src="/tmpl/pl2-mttcard.go.html"
+            width="515"
+            height="515">
+        </iframe>
+
+        <img class='ghost' src='/res/img/mystery-ghost-pixel-perfect.png'>
+    </body>
+</html>

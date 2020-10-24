@@ -67,6 +67,8 @@ func startServer(cfg Config) voidCloser {
         logger.Fatalf("Failed to add 'timer' to the server: %+v", err)
     }
 
+    AddMTTCard(srv)
+
     lst, err := srv.Listen(cfg.Host, cfg.Port)
     if err != nil {
         logger.Fatalf("Failed to start server: %+v", err)

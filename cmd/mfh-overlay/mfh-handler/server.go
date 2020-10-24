@@ -31,6 +31,10 @@ const (
     ExtraDataNotStrKeys
     // Can't read custom fields from a map of non-interface elements
     ExtraDataNotInterfaceMap
+    // Invalid title card page
+    ExtraBadTitleCardPage
+    // Couldn't find the requested title card
+    ExtraBadTitleCard
 )
 
 // Implement the `error` interface for `errorCode`.
@@ -56,6 +60,10 @@ func (e errorCode) Error() string {
         return "Can't read custom fields from a map of non-string keys"
     case ExtraDataNotInterfaceMap:
         return "Can't read custom fields from a map of non-interface elements"
+    case ExtraBadTitleCardPage:
+        return "mfh-handler: Invalid title card page"
+    case ExtraBadTitleCard:
+        return "mfh-handler: Couldn't find the requested title card"
     default:
         return "mfh-handler: Unknown"
     }
