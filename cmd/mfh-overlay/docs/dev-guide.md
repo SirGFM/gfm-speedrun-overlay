@@ -27,3 +27,19 @@ Currently, its API is documented only on the source code itself. For more inform
 Handle/entry-point: `mfh-handler`
 
 Custom handler that shall implement all the custom operations required by this service.
+
+### Last update sub-handler
+
+Handle/entry-point: `mfh-handler/last-update`
+
+Returns an object with the last date, in milliseconds since the Unix epoch, when anything on `mfh-handler` was updated. This information may be used to automatically reload a page if anything changed.
+
+The date is represented by the field `Date`, an integer, of the returned object. For example, the date 2021-05-29T23:21:57+00:00 would be returned as:
+
+```json
+{
+    "Date": 1622330517000
+}
+```
+
+To use this, simply include [auto\_reload.js)](../res/script/auto_reload.js) in the desired page and call `auto_reload.update()` periodically.
