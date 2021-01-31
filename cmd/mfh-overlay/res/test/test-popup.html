@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <style>
+            .hidden {
+                visibility: hidden;
+                display: none;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                width: 0;
+                height: 0;
+            }
+        </style>
+
+        <script type="text/javascript" src="/res/script/conn.js"></script>
+        <script type="text/javascript" src="/res/script/popup.js"></script>
+
+        <script>
+                document.addEventListener("DOMContentLoaded", function (event) {
+                    window.setInterval(function() {
+                        console.log("checking...");
+                        popup.update();
+                    }, 100);
+                });
+        </script>
+    </head>
+    <body>
+        <input onclick="popup.show('mystery');" type="button" value="Well...">
+        <p id='mystery' class='hidden' > 👻 ⁉️  </p>
+    </body>
+</html>

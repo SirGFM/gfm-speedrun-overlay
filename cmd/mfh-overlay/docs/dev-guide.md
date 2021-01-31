@@ -43,3 +43,28 @@ The date is represented by the field `Date`, an integer, of the returned object.
 ```
 
 To use this, simply include [auto\_reload.js)](../res/script/auto_reload.js) in the desired page and call `auto_reload.update()` periodically.
+
+### Popup sub-handler
+
+Handle/entry-point: `mfh-handler/last-update`
+
+Manages a list of IDs and their timeouts, in milliseconds. These may be used to report to a page that a dynamic element (controlled by a script) should be temporarily displayed.
+
+A single element is represented by the field `Id`, a string, and `Timeout`, an integer. Regardless of whether the server returns multiple elements or a single one, it always returns these elements in the array `Elements`. For example, a response to show the IDs `TangibleProgress-p1` for 2.5s and `BigBoints-p2` for 5s would be represented by the following object:
+
+```json
+{
+    "Elements": [
+        {
+            "Id": "TangibleProgress-p1",
+            "Timeout": 2500
+        },
+        {
+            "Id": "BigBoints-p2",
+            "Timeout": 3000
+        }
+    ]
+}
+```
+
+To use this, simply include [popup.js)](../res/script/popup.js) in the desired page, define a CSS class `hidden` for setting an object's visibility to invisible, call `popup.update()` periodically (to check if any object should be shown) and call `popup.show()` to report to the server that an object should be shown.

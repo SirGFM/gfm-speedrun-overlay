@@ -19,6 +19,43 @@ func (*serverContext) Dependencies() []string {
     return nil
 }
 
+// Handle popup requests in this server
+func (ctx *serverContext) handlePopup(w http.ResponseWriter, req *http.Request, urlPath []string) error {
+    switch req.Method {
+    case http.MethodGet:
+        popups := ctx.getPopupList()
+        r := struct { Elements []popup } { Elements: popups }
+
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        enc := json.NewEncoder(w)
+        err := enc.Encode(&r)
+        if err != nil {
+            logger.Errorf("mfh-handler: Failed to encode the response: %+v (payload: %+v)", Prefix, err, r)
+        }
+        break;
+    case http.MethodPost:
+        var got popup
+
+        dec := json.NewDecoder(req.Body)
+        err := dec.Decode(&got)
+        if err != nil {
+            logger.Errorf("mfh-handler: Failed to decode popup data: %+v", err)
+            return BadJSONInput
+        }
+
+        ctx.pushPopupElement(got.Id, got.Timeout)
+        w.WriteHeader(http.StatusNoContent)
+        break;
+    default:
+        res := "Invalid method for /mfh-handler/popup"
+        status := http.StatusMethodNotAllowed
+        return srv_iface.NewHttpError(nil, "mfh-handler", res, status)
+    }
+
+    return nil
+}
+
 // Implement the server interface, so serverContext may report when it changes
 func (ctx *serverContext) Handle(w http.ResponseWriter, req *http.Request, urlPath []string) error {
     if len(urlPath) == 2 && urlPath[1] == "last-update" && req.Method == http.MethodGet {
@@ -34,6 +71,8 @@ func (ctx *serverContext) Handle(w http.ResponseWriter, req *http.Request, urlPa
         }
 
         return nil
+    } else if len(urlPath) == 2 && urlPath[1] == "popup" {
+        return ctx.handlePopup(w, req, urlPath)
     } else {
         res := "Invalid path"
         status := http.StatusBadRequest

@@ -7,6 +7,23 @@ import (
     "time"
 )
 
+// Errors returned by this package.
+type errorCode uint
+const (
+    // Failed to decode the JSON input
+    BadJSONInput errorCode = iota
+)
+
+// Implement the `error` interface for `errorCode`.
+func (e errorCode) Error() string {
+    switch e {
+    case BadJSONInput:
+        return "mfh-handler: Failed to decode the JSON input"
+    default:
+        return "mfh-handler: Unknown"
+    }
+}
+
 // Simple timer for tracking when the service was updated.
 type timer struct {
     // The stored time.
@@ -17,10 +34,28 @@ type timer struct {
     tryWrite uint32
 }
 
+// Describe a popup element that should be temporarily displayed.
+type popup struct {
+    // The ID of the HTML element to be shown and later hidden.
+    Id string
+    // How long, in milliseconds, until the element it hidden.
+    Timeout int64
+}
+
+// List of popup elements, with synchronized access
+type popupList struct {
+    // The list of elements
+    list []popup
+    // Synchronize access to the popups list
+    m sync.Mutex
+}
+
 // The context that store page's data.
 type serverContext struct {
     // Last time the structure was updated.
     lastUpdate timer
+    // List of elements that should be temporarily displayed.
+    popups popupList
 }
 
 // Retrieve the last updated time
@@ -44,6 +79,30 @@ func (ctx *serverContext) update() {
         ctx.lastUpdate.m.Unlock()
         atomic.StoreUint32(&ctx.lastUpdate.tryWrite, 0)
     }
+}
+
+// Push a popup element into the list of elements to be temporarily shown.
+func (ctx *serverContext) pushPopupElement(id string, timeout int64) {
+    ctx.popups.m.Lock()
+    defer ctx.popups.m.Unlock()
+
+    p := popup {
+        Id: id,
+        Timeout: timeout,
+    }
+
+    ctx.popups.list = append(ctx.popups.list, p)
+}
+
+// Get the list of popup elements, emptying the list in the process.
+func (ctx *serverContext) getPopupList() []popup {
+    ctx.popups.m.Lock()
+    defer ctx.popups.m.Unlock()
+
+    tmp := ctx.popups.list
+
+    ctx.popups.list = ctx.popups.list[:0]
+    return tmp
 }
 
 // Clean up the container, removing all associated resources.
