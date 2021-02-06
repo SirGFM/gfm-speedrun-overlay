@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <style>
+            input {
+                margin: 0.1em;
+                margin-left: 0.25em;
+                margin-right: 0.25em;
+                flex-grow: 1;
+                font-size: large;
+                height: 50px;
+            }
+        </style>
+
+        <script type="text/javascript" src="/res/script/conn.js"></script>
+        <script>
+            let skipTimerUpdate = true;
+        </script>
+        <script type="text/javascript" src="/res/script/timer.js"></script>
+    </head>
+    <body>
+        <h2> ⏱️ Timer ⏱️ </h2>
+
+        <div class='hor'>
+            <input onclick="timer.stop();" type="button" value="Stop Timer">
+            <input onclick="timer.reset();" type="button" value="Reset Timer">
+            <input onclick="timer.start();" type="button" value="Start Timer">
+        </div>
+
+        <div class='hor'>
+            <input onclick="timer.set(document.getElementById('ini-time').valueAsNumber);" type="button" value="Set timer">
+            <input type="time" step="1" value="00:00:00" id="ini-time" name="ini-time">
+        </div>
+    </body>
+</html>

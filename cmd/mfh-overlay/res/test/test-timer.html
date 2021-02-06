@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <style>
+            span.timer {
+                display: inline-block;
+                font-size: 40px;
+                width: 20px;
+                height: 34px;
+                text-align: center;
+                margin: 0;
+            }
+            span.timer-sep {
+                width: 14px;
+            }
+            span.timer-small {
+                font-size: 26px;
+                width: 13px;
+            }
+            span.timer-small-sep {
+                width: 9px;
+            }
+            span#ms-ld {
+                margin-right: 8px;
+            }
+        </style>
+
+        <script type="text/javascript" src="/res/script/conn.js"></script>
+        <script type="text/javascript" src="/res/script/timer.js"></script>
+
+        <script>
+                document.addEventListener("DOMContentLoaded", function (event) {
+                    window.setInterval(function() {
+                        timer.update();
+                    }, 9);
+                });
+        </script>
+    </head>
+    <body>
+        <div class='timer'>
+            <span style='visibility: hidden' class='timer' id='hour-hd'>0</span>
+            <span style='visibility: hidden' class='timer' id='hour-ld'>0</span>
+            <span style='visibility: hidden' class='timer timer-sep' id='min-colon'>:</span>
+            <span style='visibility: hidden' class='timer' id='min-hd'>0</span>
+            <span style='visibility: hidden' class='timer' id='min-ld'>0</span>
+            <span style='visibility: hidden' class='timer timer-sep' id='s-colon'>:</span>
+            <span style='visibility: hidden' class='timer' id='s-hd'>0</span>
+            <span class='timer' id='s-ld'>0</span>
+            <span class='timer timer-small timer-small-sep' id='ms-dot'>.</span>
+            <span class='timer timer-small' id='ms-hd'>0</span>
+            <span class='timer timer-small' id='ms-ld'>0</span>
+        </div>
+    </body>
+</html>
