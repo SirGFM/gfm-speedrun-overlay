@@ -86,7 +86,9 @@ func (t *timer) unsafeStart() {
 // Start the timer, from its currently accumulated value.
 func (t *timer) Start() {
     t.rwmut.Lock()
-    t.unsafeStart()
+    if !t.running {
+        t.unsafeStart()
+    }
     t.rwmut.Unlock()
 }
 
