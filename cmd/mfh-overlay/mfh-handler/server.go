@@ -2,6 +2,7 @@ package mfh_handler
 
 import (
     srv_iface "github.com/SirGFM/gfm-speedrun-overlay/web/server/common"
+    "github.com/SirGFM/gfm-speedrun-overlay/web/tmpl"
     "sync"
     "sync/atomic"
     "time"
@@ -12,6 +13,8 @@ type errorCode uint
 const (
     // Failed to decode the JSON input
     BadJSONInput errorCode = iota
+    // Didn't find any resource associated with the given path
+    ResourceNotFound
 )
 
 // Implement the `error` interface for `errorCode`.
@@ -19,6 +22,8 @@ func (e errorCode) Error() string {
     switch e {
     case BadJSONInput:
         return "mfh-handler: Failed to decode the JSON input"
+    case ResourceNotFound:
+        return "mfh-handler: Didn't find any resource associated with the given path"
     default:
         return "mfh-handler: Unknown"
     }
@@ -52,6 +57,8 @@ type popupList struct {
 
 // The context that store page's data.
 type serverContext struct {
+    // Data used to customize pages, keyed by the SHA-256 of the path.
+    data map[string]interface{}
     // Last time the structure was updated.
     lastUpdate timer
     // List of elements that should be temporarily displayed.
@@ -111,11 +118,14 @@ func (ctx *serverContext) Close() {
 
 // `srv_iface.Server`, so it may be used as a server and for templating.
 type Context interface {
+    tmpl.DataCRUD
+    tmpl.Mapper
     srv_iface.Handler
 }
 
 // Retrieve a new data server
 func New() Context {
     ctx := serverContext {}
+    ctx.data = make(map[string]interface{})
     return &ctx
 }

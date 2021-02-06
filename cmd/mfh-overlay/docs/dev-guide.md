@@ -68,3 +68,13 @@ A single element is represented by the field `Id`, a string, and `Timeout`, an i
 ```
 
 To use this, simply include [popup.js)](../res/script/popup.js) in the desired page, define a CSS class `hidden` for setting an object's visibility to invisible, call `popup.update()` periodically (to check if any object should be shown) and call `popup.show()` to report to the server that an object should be shown.
+
+## Template module
+
+Handle/entry-point: `tmpl`
+
+The standard "template" module. This is quite similar to the resource module, but the retrieved resources are dynamic HTML pages, instead of static ones.
+
+Currently, its API is documented only on the source code itself. For more information, see [web/tmpl/tmpl.go](../../../web/tmpl/tmpl.go)
+
+The data for dynamic pages is stored in `mfh-handler`.

@@ -6,6 +6,7 @@ import (
     "github.com/SirGFM/gfm-speedrun-overlay/web/res"
     "github.com/SirGFM/gfm-speedrun-overlay/web/server"
     "github.com/SirGFM/gfm-speedrun-overlay/web/timer"
+    "github.com/SirGFM/gfm-speedrun-overlay/web/tmpl"
     "os"
     "os/signal"
     "path/filepath"
@@ -53,7 +54,12 @@ func startServer(cfg Config) voidCloser {
         logger.Fatalf("Failed to set 'res' as the default handler: %+v", err)
     }
 
-    ctrlCtx := mfh_handler.New()
+    // Add MFH's handler both as a template and a handler by itself
+     ctrlCtx := mfh_handler.New()
+    err = tmpl.GetHandle(srv, nil, ctrlCtx, ctrlCtx)
+    if err != nil {
+        logger.Fatalf("Failed to add 'res' to the server: %+v", err)
+    }
     srv.AddHandler(ctrlCtx)
 
     err = timer.GetHandle(srv)
