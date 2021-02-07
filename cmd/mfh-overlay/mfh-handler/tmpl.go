@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "github.com/SirGFM/gfm-speedrun-overlay/logger"
     "github.com/SirGFM/gfm-speedrun-overlay/web/tmpl"
+    "strings"
 )
 
 // Converts a resource's path into a unique name, from its SHA-256. To
@@ -75,5 +76,8 @@ func (ctx *serverContext) Delete(resource []string) error {
 
 // Map resources into themselves (as this doesn't need any fancy mapping).
 func (ctx *serverContext) Map(resource []string) ([]string, error) {
+    if len(resource) == 2 && resource[0] == "tmpl" && strings.HasSuffix(resource[1], "twitch-iframe.go.html") {
+        return []string{"tmpl", "twitch-iframe.go.html"}, nil
+    }
     return resource, nil
 }

@@ -78,3 +78,11 @@ The standard "template" module. This is quite similar to the resource module, bu
 Currently, its API is documented only on the source code itself. For more information, see [web/tmpl/tmpl.go](../../../web/tmpl/tmpl.go)
 
 The data for dynamic pages is stored in `mfh-handler`.
+
+### Twitch stream page
+
+Resource: `tmpl/<identifier>twitch-iframe.go.html`
+
+One of the template's pages. This page allows configuring the twitch channel to be accessed, as well as the stream's resolution. By using different identifiers for each player on OBS (say, `pl1-twitch-iframe.go.html`, `pl2-twitch-iframe.go.html` etc), it's possible to automatically change the source without having to manually change the Browser Source.
+
+This page must be configured with an object with a `TwitchUsername` field, the channel's name (so, for `https://www.twitch.tv/mysteryfunhouse` it would be only `mysteryfunhouse`), and two optional dimentions, on fields `Width` and `Height`. If not specified, the dimensions default to 852x480.

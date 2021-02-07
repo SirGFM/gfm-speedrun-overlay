@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title> {{.TwitchUsername}} Twitch IFrame </title>
+        <meta
+            charset="utf-8"
+            name="viewport"
+            content="width={{if .Width}}{{.Width}}{{else}}852{{end}}, height={{if .Height}}{{.Height}}{{else}}480{{end}}, initial-scale=1" />
+
+        <style>
+            html, body {
+                /* NOTE: There can't be any space between the dimension and
+                 * the unit... so these value must be defined in this
+                 * unreadable, messed format. :/ */
+                width: {{if .Width}}{{.Width}}{{else}}852{{end}}px;
+                height: {{if .Height}}{{.Height}}{{else}}480{{end}}px;
+                margin: 0;
+                padding: 0;
+                border: none;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <iframe
+            src="https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false"
+            width="{{if .Width}}{{.Width}}{{else}}852{{end}}"
+            height="{{if .Height}}{{.Height}}{{else}}480{{end}}"
+            allowfullscreen="false"
+            muted="false"
+            allow="autoplay">
+        </iframe>
+    </body>
+</html>
