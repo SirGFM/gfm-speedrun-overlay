@@ -25,7 +25,9 @@ package tmpl
 import (
     "bytes"
     "crypto/sha256"
+    "encoding/json"
     "github.com/SirGFM/gfm-speedrun-overlay/common"
+    "github.com/SirGFM/gfm-speedrun-overlay/logger"
     "html/template"
     "io"
     "io/ioutil"
@@ -138,14 +140,44 @@ func (*dummyWriter) Write(data []byte) (int, error) {
     return len(data), nil
 }
 
+// Retrieve the data associated with the requested page.
+func (r *request) unsafeGetPageData() (interface{}, error) {
+    data, err := r.ctx.data.Read(r.urlPath)
+    if err != nil {
+        res := "Couldn't retrieve the associated data"
+        return nil, newError(err, res, http.StatusInternalServerError)
+    }
+
+    return data, nil
+}
+
+// Serve the data associated with the requested path.
+func (r *request) servePageData() error {
+    // Retrieve the data associated with the resource
+    r.ctx.rwmut.RLock()
+    data, err := r.unsafeGetPageData()
+    r.ctx.rwmut.RUnlock()
+    if err != nil {
+        return err
+    }
+
+    r.w.Header().Set("Content-Type", "application/json")
+    r.w.WriteHeader(http.StatusOK)
+    enc := json.NewEncoder(r.w)
+    err = enc.Encode(data)
+    if err != nil {
+        logger.Errorf("web%s: Failed to encode the response: %+v (payload: %+v)", Prefix, err, data)
+    }
+    return nil
+}
+
 // Serve the requested file, using the data associated with its path to
 // execute the template.
 func (r *request) unsafeServeFile(filePath, ctype string) error {
     // Retrieve the data associated with the resource
-    data, err := r.ctx.data.Read(r.urlPath)
+    data, err := r.unsafeGetPageData()
     if err != nil {
-        res := "Couldn't retrieve the associated data"
-        return newError(err, res, http.StatusInternalServerError)
+        return err
     }
 
     // Guaranteed to be OK,from a previous check.
@@ -185,6 +217,12 @@ func (r *request) get() error {
     if len(filePath) == 0 {
         reason := "No resource was specified"
         return newError(nil, reason, http.StatusNotFound)
+    }
+
+    // If the client specifically request a JSON, return the data stored
+    // for that page.
+    if r.req.Header.Get("Accept") == "application/json" {
+        return r.servePageData()
     }
 
     // Retrieve the file if it's in any of the listed directories
