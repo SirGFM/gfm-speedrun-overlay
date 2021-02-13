@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "github.com/SirGFM/gfm-speedrun-overlay/logger"
     "github.com/SirGFM/gfm-speedrun-overlay/web/tmpl"
+    "reflect"
     "strings"
 )
 
@@ -46,15 +47,105 @@ func (ctx *serverContext) Create(resource []string, data tmpl.DataReader) error 
     return ctx.store(resource2name(resource), data)
 }
 
+// A custom field that will be added to an existing resource.
+type customField struct {
+    // The field's Key.
+    key string
+    // The field's Value.
+    val interface{}
+}
+
+// Add a list of customField to a given object, `data`, that should have
+// been decoded from a JSON, and thus should be a map of string to
+// interfaces.
+func addCustomFields(data interface{}, fields []customField) (interface{}, error) {
+    var newData interface{}
+
+    // To avoid modifying the original data, encode the data to a JSON
+    // string and decode it back to a new, independent object.
+    // Yes, this is ugly, but it gets the job done. *shrug*
+    encData, err := json.Marshal(data)
+    if err != nil {
+        logger.Errorf("mfh-handler: Couldn't encode the resource to JSON: %+v", err)
+        return nil, TmplCopyResource
+    }
+    err = json.Unmarshal(encData, &newData)
+    if err != nil {
+        logger.Errorf("mfh-handler: Couldn't decode the copy of the resource: %+v", err)
+        return nil, TmplGetCopyResource
+    }
+
+    // Ensure that the assumption about this being a map of string to
+    // interfaces is valid.
+    val := reflect.ValueOf(newData)
+    typ := val.Type()
+    if typ.Kind() != reflect.Map {
+        return nil, TmplResourceNotAMap
+    } else if typ.Key().Kind() != reflect.String {
+        return nil, TmplResourceNotStrKeys
+    } else if typ.Elem().Kind() != reflect.Interface {
+        return nil, TmplResourceNotInterfaceMap
+    }
+
+    for i := range fields {
+        key := reflect.ValueOf(fields[i].key)
+        el := reflect.ValueOf(fields[i].val)
+        val.SetMapIndex(key, el)
+    }
+
+    return val.Interface(), nil
+}
+
 // Retrieve the data associated with a given resource.
 func (ctx *serverContext) Read(resource []string) (interface{}, error) {
+    var customFields []customField
+
+    // Store the original resource for error reporting.
+    origRes := resource
+
+    // Retrieve any custom, hard-coded values that the resource may have,
+    // also normalizing its path.
+    if len(resource) == 2 && resource[0] == "tmpl" {
+        if strings.HasPrefix(resource[1], "1v1-") {
+            field := customField {
+                "Layout2v2",
+                false,
+            }
+            customFields  = append(customFields, field)
+
+            lastPart := resource[1][4:]
+            resource = []string{"tmpl", lastPart}
+        } else if strings.HasPrefix(resource[1], "2v2-") {
+            field := customField {
+                "Layout2v2",
+                true,
+            }
+            customFields  = append(customFields, field)
+
+            lastPart := resource[1][4:]
+            resource = []string{"tmpl", lastPart}
+        }
+    }
+
     name := resource2name(resource)
     if _, ok := ctx.data[name]; !ok {
-        logger.Errorf("mfh-handler: Couldn't find the resource associated with %+v", resource)
+        logger.Errorf("mfh-handler: Couldn't find the resource associated with %+v", origRes)
         return nil, ResourceNotFound
     }
 
-    return ctx.data[name], nil
+    // Add custom fields to the retrieved data.
+    data := ctx.data[name]
+    if len(customFields) > 0 {
+        newData, err := addCustomFields(data, customFields)
+        if err != nil {
+            logger.Errorf("mfh-handler: Couldn't add custom fields to the resource %+v", origRes)
+            return nil, err
+        }
+
+        data = newData
+    }
+
+    return data, nil
 }
 
 // Update an already existing resource. Identical to "Create".
@@ -76,8 +167,14 @@ func (ctx *serverContext) Delete(resource []string) error {
 
 // Map resources into themselves (as this doesn't need any fancy mapping).
 func (ctx *serverContext) Map(resource []string) ([]string, error) {
-    if len(resource) == 2 && resource[0] == "tmpl" && strings.HasSuffix(resource[1], "twitch-iframe.go.html") {
-        return []string{"tmpl", "twitch-iframe.go.html"}, nil
+    if len(resource) == 2 && resource[0] == "tmpl" {
+        if strings.HasSuffix(resource[1], "twitch-iframe.go.html") {
+            return []string{"tmpl", "twitch-iframe.go.html"}, nil
+        } else if strings.HasPrefix(resource[1], "1v1-") || strings.HasPrefix(resource[1], "2v2-") {
+            lastPart := resource[1][4:]
+            return []string{"tmpl", lastPart}, nil
+        }
     }
+
     return resource, nil
 }

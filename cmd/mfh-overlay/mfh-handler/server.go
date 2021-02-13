@@ -15,6 +15,16 @@ const (
     BadJSONInput errorCode = iota
     // Didn't find any resource associated with the given path
     ResourceNotFound
+    // Couldn't create a JSON-encoded copy of the requested resource
+    TmplCopyResource
+    // Couldn't create a JSON-decoded copy of the requested resource
+    TmplGetCopyResource
+    // Can't add custom field to non-map value
+    TmplResourceNotAMap
+    // Can't add custom field to a map of non-string keys
+    TmplResourceNotStrKeys
+    // Can't add custom field to a map of non-interface elements
+    TmplResourceNotInterfaceMap
 )
 
 // Implement the `error` interface for `errorCode`.
@@ -24,6 +34,16 @@ func (e errorCode) Error() string {
         return "mfh-handler: Failed to decode the JSON input"
     case ResourceNotFound:
         return "mfh-handler: Didn't find any resource associated with the given path"
+    case TmplCopyResource:
+        return "Couldn't create a JSON-encoded copy of the requested resource"
+    case TmplGetCopyResource:
+        return "Couldn't create a JSON-decoded copy of the requested resource"
+    case TmplResourceNotAMap:
+        return "mfh-handler: Can't add custom field to non-map value"
+    case TmplResourceNotStrKeys:
+        return "Can't add custom field to a map of non-string keys"
+    case TmplResourceNotInterfaceMap:
+        return "Can't add custom field to a map of non-interface elements"
     default:
         return "mfh-handler: Unknown"
     }
