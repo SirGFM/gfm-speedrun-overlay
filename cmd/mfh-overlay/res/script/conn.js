@@ -1,5 +1,82 @@
 let conn = function() {
     /**
+     * Open a new connection that may be configured as needed.
+     *
+     * Configuration of the connection should be done by making successive
+     * 'addHeader()' calls (which may be made in sequence, like
+     * 'getter.addHeader(...).addHeader(...);').
+     *
+     * Then, 'send()' must be called to actually execute the request.
+     *
+     * @param{url} HTTP address of the connecting server.
+     * @param{mode} HTTP Method for the connection (e.g., PUT or GET).
+     * @param{async} HTTP Method for the connection (e.g., PUT or GET).
+     */
+    let _newConn = function(url, mode, async) {
+        /* Open the connection. */
+        let xhr = new XMLHttpRequest();
+        xhr.open(mode, url, async);
+        xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+
+        let okCode = 200;
+        if (mode != 'GET') {
+            okCode = 204;
+        }
+
+        /**
+         * Add a new header to the connection.
+         *
+         * @param{key} The header's key (e.g., 'Content-Type').
+         * @param{value} The header's value (e.g., 'application/json').
+         * @return The connection object itself.
+         */
+        let _addHeader = function(key, value) {
+            xhr.setRequestHeader(key, value);
+            return this;
+        }
+
+        /** Function used to ignore callbacks. */
+        let _ignore = function(e) {}
+
+        /**
+         * Send the HTTP message.
+         *
+         * @param{obj} Data to be sent in the message.
+         * @param{okCb} Callback if the operation is successfull.
+         * @param{errCb} Callback if the operation fails.
+         */
+        let _send = function(obj, okCb, errCb) {
+            if (okCb) {
+                let cb = function (e) {
+                    let htmlResponse = e.target;
+                    if (htmlResponse.status == okCode) {
+                        okCb(htmlResponse.response);
+                    }
+                    else {
+                        errCb(e);
+                    }
+                };
+                xhr.addEventListener("loadend", cb);
+            }
+            if (errCb) {
+                xhr.addEventListener("error", errCb);
+            }
+
+            /* Ignore other events */
+            xhr.addEventListener("loadstart", _ignore);
+            xhr.addEventListener("load", _ignore);
+            xhr.addEventListener("progress", _ignore);
+
+            xhr.send(obj);
+        }
+
+        return {
+            "addHeader": _addHeader,
+            "send": _send,
+        };
+    }
+
+    /**
      * "Handles" anything that goes wrong.
      *
      * @param{e} The event
@@ -9,31 +86,22 @@ let conn = function() {
     }
 
     /**
-     * Open a new connection. After this, the caller only has to call xhr.send(obj).
+     * Send a request with the specified mode.
      *
      * @param{url} HTTP address of the connecting server.
      * @param{mode} HTTP Method for the connection (e.g., PUT or GET).
-     * @param{onLoad} Callback executed when the request is fully sent/received.
+     * @param{obj} The object to be sent.
+     * @param{okCb} Callback executed when the request is fully sent/received.
      *                onLoad must receive a single argument (the response).
      * @return A newly set up XMLHttpRequest.
      */
-    let _openConn = function(url, mode, onLoad=null, async=true) {
-        let xhr = new XMLHttpRequest();
-        xhr.open(mode, url, async);
+    let _sendReq = function(url, mode, obj, okCb) {
+        let _c = _newConn(url, mode, true);
 
-        if (onLoad) {
-            let cb = function (e) {
-                let res = e.target.response;
-                onLoad(res);
-            };
-            xhr.addEventListener("loadend", cb);
+        if (obj) {
+            _c.addHeader("Content-Type", "application/json");
         }
-        xhr.addEventListener("error", _onError);
-
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-
-        return xhr;
+        _c.send(obj, okCb, _onError);
     }
 
     /**
@@ -44,8 +112,7 @@ let conn = function() {
      *               onDel must receive a single argument (the response).
      */
     function _delData(url, onDel) {
-        let xhr = _openConn(url, "DELETE", onDel);
-        xhr.send(null);
+        _sendReq(url, "DELETE", null, onDel);
     }
 
     /**
@@ -57,8 +124,7 @@ let conn = function() {
      *               onPut must receive a single argument (the response).
      */
     function _updateData(url, obj, onPut) {
-        let xhr = _openConn(url, "PUT", onPut);
-        xhr.send(obj);
+        _sendReq(url, "PUT", obj, onPut);
     }
 
     /**
@@ -69,8 +135,7 @@ let conn = function() {
      *                onLoad must receive a single argument (the response).
      */
     function _getData(url, onLoad) {
-        let xhr = _openConn(url, "GET", onLoad);
-        xhr.send(null);
+        _sendReq(url, "GET", null, onLoad);
     }
 
     /**
@@ -90,8 +155,7 @@ let conn = function() {
         if (!onSave) {
             onSave = _onSave;
         }
-        let xhr = _openConn(url, method, onSave);
-        xhr.send(obj);
+        _sendReq(url, method, obj, onSave);
     }
 
     return {
@@ -99,5 +163,6 @@ let conn = function() {
         "sendData": _sendData,
         "delData": _delData,
         "updateData": _updateData,
+        "newConn": _newConn,
     };
 }();

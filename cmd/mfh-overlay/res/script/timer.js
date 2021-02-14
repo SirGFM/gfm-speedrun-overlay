@@ -127,11 +127,22 @@ let timer = function() {
     }
 
     /**
+     * "Handles" anything that goes wrong.
+     *
+     * @param{e} The event
+     */
+    let _onError = function(e) {
+        alert(e);
+    }
+
+    /**
      * Request the current timer to the server and update the timer label.
      */
     let _update = function() {
         try {
-            conn.getData('/timer', _updateTimer);
+            let _c = conn.newConn('/timer', 'GET', true);
+            _c.addHeader("Content-Type", "application/json");
+            _c.send(null, _updateTimer, _onError);
         } catch (e) {
             console.log(e);
         }
