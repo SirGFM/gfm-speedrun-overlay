@@ -25,6 +25,12 @@ const (
     TmplResourceNotStrKeys
     // Can't add custom field to a map of non-interface elements
     TmplResourceNotInterfaceMap
+    // Can't read custom fields from a non-map value
+    ExtraDataNotAMap
+    // Can't read custom fields from a map of non-string keys
+    ExtraDataNotStrKeys
+    // Can't read custom fields from a map of non-interface elements
+    ExtraDataNotInterfaceMap
 )
 
 // Implement the `error` interface for `errorCode`.
@@ -44,6 +50,12 @@ func (e errorCode) Error() string {
         return "Can't add custom field to a map of non-string keys"
     case TmplResourceNotInterfaceMap:
         return "Can't add custom field to a map of non-interface elements"
+    case ExtraDataNotAMap:
+        return "Can't read custom fields from a non-map value"
+    case ExtraDataNotStrKeys:
+        return "Can't read custom fields from a map of non-string keys"
+    case ExtraDataNotInterfaceMap:
+        return "Can't read custom fields from a map of non-interface elements"
     default:
         return "mfh-handler: Unknown"
     }
@@ -75,6 +87,17 @@ type popupList struct {
     m sync.Mutex
 }
 
+// Extra data, configurable from the dashboard and appended to
+// /tmpl/overlay.go.html.
+type extraData struct {
+    // The raw, decoded received object.
+    obj interface{}
+    // The list of elements.
+    parsed []customField
+    // Synchronize access to the data list.
+    m sync.RWMutex
+}
+
 // The context that store page's data.
 type serverContext struct {
     // Data used to customize pages, keyed by the SHA-256 of the path.
@@ -83,6 +106,8 @@ type serverContext struct {
     lastUpdate timer
     // List of elements that should be temporarily displayed.
     popups popupList
+    // Extra elements that may be added to the overlay.
+    extra extraData
 }
 
 // Retrieve the last updated time

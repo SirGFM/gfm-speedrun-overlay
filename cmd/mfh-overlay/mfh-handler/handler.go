@@ -56,6 +56,30 @@ func (ctx *serverContext) handlePopup(w http.ResponseWriter, req *http.Request, 
     return nil
 }
 
+// Handle overlay-extras requests in this server
+func (ctx *serverContext) handleOverlayExtras(w http.ResponseWriter, req *http.Request, urlPath []string) error {
+    switch req.Method {
+    case http.MethodGet:
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        ctx.getExtraJSON(w)
+        break;
+    case http.MethodPost:
+        err := ctx.putExtraJson(req.Body)
+        if err != nil {
+            return err
+        }
+        w.WriteHeader(http.StatusNoContent)
+        break;
+    default:
+        res := "Invalid method for /mfh-handler/overlay-extra"
+        status := http.StatusMethodNotAllowed
+        return srv_iface.NewHttpError(nil, "mfh-handler", res, status)
+    }
+
+    return nil
+}
+
 // Implement the server interface, so serverContext may report when it changes
 func (ctx *serverContext) Handle(w http.ResponseWriter, req *http.Request, urlPath []string) error {
     if len(urlPath) == 2 && urlPath[1] == "last-update" && req.Method == http.MethodGet {
@@ -73,6 +97,8 @@ func (ctx *serverContext) Handle(w http.ResponseWriter, req *http.Request, urlPa
         return nil
     } else if len(urlPath) == 2 && urlPath[1] == "popup" {
         return ctx.handlePopup(w, req, urlPath)
+    } else if len(urlPath) == 2 && urlPath[1] == "overlay-extras" {
+        return ctx.handleOverlayExtras(w, req, urlPath)
     } else {
         res := "Invalid path"
         status := http.StatusBadRequest

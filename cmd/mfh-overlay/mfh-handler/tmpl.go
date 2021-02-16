@@ -133,6 +133,10 @@ func (ctx *serverContext) Read(resource []string) (interface{}, error) {
         return nil, ResourceNotFound
     }
 
+    // Set the win flag (and other static resources) from the extra data.
+    customFields = ctx.getExtraData(customFields)
+    defer ctx.unlockExtraData()
+
     // Add custom fields to the retrieved data.
     data := ctx.data[name]
     if len(customFields) > 0 {

@@ -69,6 +69,24 @@ A single element is represented by the field `Id`, a string, and `Timeout`, an i
 
 To use this, simply include [popup.js)](../res/script/popup.js) in the desired page, define a CSS class `hidden` for setting an object's visibility to invisible, call `popup.update()` periodically (to check if any object should be shown) and call `popup.show()` to report to the server that an object should be shown.
 
+## Extra module
+
+Handle/entry-point: `mfh-handler/overlay-extras`
+
+This is sort of a hack... This module was implemented before it was possible to retrieve the raw data for a dynamic page. So, to add more information to the overlay page without having to resend everything, one could simply add arbitrary data to this module.
+
+This is mainly used to register that a player finished the goal, and optionally their completition time. These information are send in a `Player<num>Won` field, a boolean, and optionally a `Player<num>Time`, the player's completition time as a human-readable string. For example, the following would be a valid object to register that player's 1 and 4 have completed a 4-way race, while only reporting the time of 16 minutes and 10 seconds for player 1:
+
+```json
+{
+    "Player1Won": true,
+    "Player1Time": "16:10.000",
+    "Player4Won": true
+}
+```
+
+This object is automatically, and independently, added to `overlay.go.html`.
+
 ## Template module
 
 Handle/entry-point: `tmpl`
