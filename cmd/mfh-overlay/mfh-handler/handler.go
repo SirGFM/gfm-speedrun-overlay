@@ -22,8 +22,7 @@ func (*serverContext) Dependencies() []string {
 // Implement the server interface, so serverContext may report when it changes
 func (ctx *serverContext) Handle(w http.ResponseWriter, req *http.Request, urlPath []string) error {
     if len(urlPath) == 2 && urlPath[1] == "last-update" && req.Method == http.MethodGet {
-        ms := ctx.lastUpdate.Unix()
-        ms *= 1000
+        ms := ctx.getLastUpdate()
 
         r := struct { Date int64 } { Date: ms }
         w.Header().Set("Content-Type", "application/json")
