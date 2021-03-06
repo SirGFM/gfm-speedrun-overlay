@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <title> Giant 2oopa </title>
+        <meta
+            charset="utf-8"
+            name="viewport"
+            content="width=1280, height=720, initial-scale=1" />
+        <style>
+            html, body {
+                width: 1280px;
+                height: 720px;
+                margin: 0;
+                padding: 0;
+                border: none;
+                overflow: hidden;
+            }
+            body {
+                background-color: #00000000;
+            }
+            svg, img, iframe {
+                position: absolute;
+                margin: 0;
+                padding: 0;
+                top: 0;
+                left: 0;
+                border: none;
+            }
+        </style>
+    </head>
+    <body>
+        <svg
+                width='1280'
+                height='720'
+                viewBox='0 0 1280 720'>
+            <!-- Create a mask that cover the entire view, and hides the
+               - areas where each stream is visible. Although this was
+               - defined here, it must be placed in the inner SVG's
+               - coordinate space. -->
+            <mask
+                    id='restream-mask'
+                    x='0'
+                    y='0'
+                    width='1280'
+                    height='720'>
+                <rect
+                        x='-640'
+                        y='-605'
+                        width='1280'
+                        height='720'
+                        fill='white'/>
+                <rect
+                        x='-630'
+                        y='-505'
+                        width='620'
+                        height='465'
+                        fill='black'/>
+                <rect
+                        x='10'
+                        y='-505'
+                        width='620'
+                        height='465'
+                        fill='black'/>
+            </mask>
+
+            <!-- Inner SVG, centered at Heavy Troopa's starting position.
+               - This eases scaling since, since then it will automatically
+               - grow centered at this position.
+               - This is also masked by '#restream-mask'. -->
+            <svg
+                    width='1280'
+                    height='720'
+                    x='0'
+                    y='0'
+                    viewBox='-640 -605 1280 720'
+                    mask='url(#restream-mask)'>
+                <!-- The stream's background color -->
+                <rect
+                        x='-640'
+                        y='-605'
+                        width='1280'
+                        height='720'
+                        fill='#2b2e3f'/>
+                <!-- The heavy troopa image. To simplify making it grow, it
+                   - defaults to its full size and is centered at the
+                   - desired position. Then, a SVG animation simply makes
+                   - it grow from 1/72 of the image's fully grown size to
+                   - the final size. -->
+                <image
+                        href='/res/img/troopa_image.png'
+                        width='3600'
+                        height='2880'
+                        x='-1800'
+                        y='-1440'>
+                    <animateTransform
+                            attributeName='transform'
+                            attributeType='XML'
+                            type='scale'
+                            from='0.0139'
+                            to='1'
+                            dur='4h'
+                            repeatCount='0'/>
+                </image>
+            </svg>
+        </svg>
+        <img src='/res/img/troopa_overlay.png'>
+        <iframe
+            src="/tmpl/1v1-overlay.go.html"
+            width="1280"
+            height="720">
+        </iframe>
+    </body>
+</html>
