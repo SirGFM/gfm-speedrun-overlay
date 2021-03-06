@@ -45,6 +45,35 @@ let timer = function() {
     }
 
     /**
+     * Convert a time in milliseconds into an object with a hour, minute
+     * seconds and milliseconds component.
+     *
+     * @param{_time} The time in milliseconds.
+     * @return The object with elements 'hour', 'min', 'sec' and 'ms'.
+     */
+    let _msToHMSms = function(_time) {
+        let ret = {
+             'hour': 0,
+             'min': 0,
+             'sec': 0,
+             'ms': 0,
+        };
+
+        ret.ms = _time % 1000;
+        _time = Math.trunc(_time / 1000);
+
+        ret.sec = _time % 60;
+        _time = Math.trunc(_time / 60);
+
+        ret.min = _time % 60;
+        _time = Math.trunc(_time / 60);
+
+        ret.hour = _time % 24;
+
+        return ret;
+    }
+
+    /**
      * Event handler for "/timer" requests.
      *
      * Parse and update the received timer, in milliseconds. The message
@@ -56,26 +85,20 @@ let timer = function() {
         let res = JSON.parse(e);
 
         /* Ignored anything bellow centiseconds */
-        res.Time = Math.trunc(res.Time / 10);
+        let _time = _msToHMSms(res.Time);
+        _time.ms = Math.trunc(_time.ms / 10);
 
-        let ms = res.Time % 100;
-        res.Time = Math.trunc(res.Time / 100);
-        let ms_ld = ms % 10;
-        let ms_hd = Math.trunc(ms / 10);
+        let ms_ld = _time.ms % 10;
+        let ms_hd = Math.trunc(_time.ms / 10);
 
-        let s = res.Time % 60;
-        res.Time = Math.trunc(res.Time / 60);
-        let s_ld = s % 10;
-        let s_hd = Math.trunc(s / 10);
+        let s_ld = _time.sec % 10;
+        let s_hd = Math.trunc(_time.sec / 10);
 
-        let min = res.Time % 60;
-        res.Time = Math.trunc(res.Time / 60);
-        let min_ld = min % 10;
-        let min_hd = Math.trunc(min / 10);
+        let min_ld = _time.min % 10;
+        let min_hd = Math.trunc(_time.min / 10);
 
-        let hour = res.Time % 24;
-        let hour_ld = hour % 10;
-        let hour_hd = Math.trunc(hour / 10);
+        let hour_ld = _time.hour % 10;
+        let hour_hd = Math.trunc(_time.hour / 10);
 
         timer_ms_ld.innerText = '' + ms_ld;
         timer_ms_hd.innerText = '' + ms_hd;
@@ -86,14 +109,14 @@ let timer = function() {
         timer_hour_ld.innerText = '' + hour_ld;
         timer_hour_hd.innerText = '' + hour_hd;
 
-        if (min > 0 || s > 9 || hour > 0) {
+        if (_time.min > 0 || _time.sec > 9 || _time.hour > 0) {
             timer_s_hd.style.visibility = 'visible';
         }
         else {
             timer_s_hd.style.visibility = 'hidden';
         }
 
-        if (min > 0 || hour > 0) {
+        if (_time.min > 0 || _time.hour > 0) {
             timer_s_colon.style.visibility = 'visible';
             timer_min_ld.style.visibility = 'visible';
         }
@@ -102,14 +125,14 @@ let timer = function() {
             timer_min_ld.style.visibility = 'hidden';
         }
 
-        if (min > 9 || hour > 0) {
+        if (_time.min > 9 || _time.hour > 0) {
             timer_min_hd.style.visibility = 'visible';
         }
         else {
             timer_min_hd.style.visibility = 'hidden';
         }
 
-        if (hour > 0) {
+        if (_time.hour > 0) {
             timer_min_colon.style.visibility = 'visible';
             timer_hour_ld.style.visibility = 'visible';
         }
@@ -118,7 +141,7 @@ let timer = function() {
             timer_hour_ld.style.visibility = 'hidden';
         }
 
-        if (hour > 9) {
+        if (_time.hour > 9) {
             timer_hour_hd.style.visibility = 'visible';
         }
         else {
@@ -136,16 +159,29 @@ let timer = function() {
     }
 
     /**
-     * Request the current timer to the server and update the timer label.
+     * Get the current time.
+     *
+     * On success, the callback shall receive an object with a 'Time'
+     * element, representing the currently elapsed time in milliseconds.
+     *
+     * @param{onget} Callback executed on success.
+     * @param{onerror} Callback executed on failure.
      */
-    let _update = function() {
+    let _getTime = function(onget, onerror) {
         try {
             let _c = conn.newConn('/timer', 'GET', true);
             _c.addHeader("Content-Type", "application/json");
-            _c.send(null, _updateTimer, _onError);
+            _c.send(null, onget, onerror);
         } catch (e) {
             console.log(e);
         }
+    }
+
+    /**
+     * Request the current timer to the server and update the timer label.
+     */
+    let _update = function() {
+        _getTime(_updateTimer, _onError);
     }
 
     /** Empty callback. */
@@ -194,6 +230,26 @@ let timer = function() {
     }
 
     /**
+     * Retrieve the current timer.
+     *
+     * On success, 'onget' is called with an object containing the
+     * current time in milliseconds (on element 'Time') and the time
+     * components on elements 'hour', 'min', 'sec' and 'ms'.
+     *
+     * @param{onget} Callback executed on success.
+     */
+    let _get = function(onget) {
+        let cb = function(e) {
+            let res = JSON.parse(e);
+            let _time = _msToHMSms(res.Time);
+            _time.Time = res.Time;
+
+            onget(_time);
+        }
+        _getTime(cb, null);
+    }
+
+    /**
      * Configure an initial offset for the timer.
      *
      * If the timer is already running, this offset is applied to the
@@ -214,5 +270,6 @@ let timer = function() {
         'stop': _stop,
         'reset': _reset,
         'set': _set,
+        'get': _get,
     };
 }();
