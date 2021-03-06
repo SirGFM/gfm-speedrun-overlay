@@ -9,10 +9,17 @@
         <style>
             html, body {
                 /* NOTE: There can't be any space between the dimension and
-                 * the unit... so these value must be defined in this
-                 * unreadable, messed format. :/ */
-                width: {{if .Width}}{{.Width}}{{else}}852{{end}}px;
-                height: {{if .Height}}{{.Height}}{{else}}480{{end}}px;
+                 * the unit! */
+                {{if .Width}}
+                    width: {{.Width}}px;
+                {{else}}
+                    width: 852px;
+                {{end}}
+                {{if .Height}}
+                    height: {{.Height}}px;
+                {{else}}
+                    height: 480px;
+                {{end}}
                 margin: 0;
                 padding: 0;
                 border: none;
@@ -23,8 +30,16 @@
     <body>
         <iframe
             src="https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false"
-            width="{{if .Width}}{{.Width}}{{else}}852{{end}}"
-            height="{{if .Height}}{{.Height}}{{else}}480{{end}}"
+            {{if .Width}}
+                width="{{.Width}}"
+            {{else}}
+                width="852"
+            {{end}}
+            {{if .Height}}
+                height="{{.Height}}"
+            {{else}}
+                height="480"
+            {{end}}
             allowfullscreen="false"
             muted="false"
             allow="autoplay">
