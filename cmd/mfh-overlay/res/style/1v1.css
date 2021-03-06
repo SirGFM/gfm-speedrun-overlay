@@ -37,6 +37,15 @@ div.player-name-flex {
     margin-right: 10px;
 }
 
+div.player-name-top-flex {
+    position: relative;
+    display: inline-flex;
+    flex-flow: row;
+    height: 20px;
+    max-height: 20px;
+    justify-content: space-between;
+}
+
 /* Magically center labels */
 p.center-label {
     height: 100px;

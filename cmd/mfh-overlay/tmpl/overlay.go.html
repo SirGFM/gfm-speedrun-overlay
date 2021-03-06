@@ -72,10 +72,25 @@
                     </p>
                     {{end}}
                     <div id='top-pl1-name' class='player-name-flex'>
-                        {{if .Player1Pronouns}}
-                            <p id='pl1-pronouns' class='mt-font player-pronouns resize'>
-                                {{.Player1Pronouns}}
-                            </p>
+                        {{if or .Player1Pronouns .Player1WinCount}}
+                            {{if not .Layout2v2}}
+                            <div class='player-name-top-flex'>
+                            {{end}}
+                                {{if .Player1Pronouns}}
+                                    <p id='pl1-pronouns' class='mt-font player-pronouns resize'>
+                                        {{.Player1Pronouns}}
+                                    </p>
+                                {{end}}
+                            {{if not .Layout2v2}}
+                                <!-- Empty div used so others may compute their length more easily -->
+                                <div id='pl1-empty' style='width: 0; height: 100%; position: relative;'> </div>
+                                {{if .Player1WinCount}}
+                                    <p id='pl1-win-count' class='mt-font player-pronouns resize'>
+                                        WINS - {{.Player1WinCount}}
+                                    </p>
+                                {{end}}
+                            </div>
+                            {{end}}
                         {{end}}
                         <p id='pl1-name' class='mt-font player-flex resize'>
                             {{.Player1Name}}
@@ -106,10 +121,21 @@
                     {{end}}
                     <div id='top-pl2-name' class='player-name-flex'>
                         {{if not .Layout2v2}}
-                            {{if .Player2Pronouns}}
-                                <p id='pl2-pronouns' class='mt-font player-pronouns resize'>
-                                    {{.Player2Pronouns}}
-                                </p>
+                            {{if or .Player1Pronouns .Player1WinCount}}
+                                <div class='player-name-top-flex'>
+                                    {{if .Player2WinCount}}
+                                        <p id='pl2-win-count' class='mt-font player-pronouns resize'>
+                                            WINS - {{.Player2WinCount}}
+                                        </p>
+                                    {{end}}
+                                    <!-- Empty div used so others may compute their length more easily -->
+                                    <div id='pl2-empty' style='width: 0; height: 100%; position: relative;'> </div>
+                                    {{if .Player2Pronouns}}
+                                        <p id='pl2-pronouns' class='mt-font player-pronouns resize'>
+                                            {{.Player2Pronouns}}
+                                        </p>
+                                    {{end}}
+                                </div>
                             {{end}}
                         {{end}}
                         <p id='pl2-name' class='mt-font player-flex resize'>

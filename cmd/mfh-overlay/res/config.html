@@ -134,9 +134,11 @@
 
             data.Player1Name = get_val('pl1-name');
             data.Player1Pronouns = get_val('pl1-pronouns');
+            data.Player1WinCount = get_val('pl1-win-count');
             data.Player1Audio = get_checked('pl1-audio');
             data.Player2Name = get_val('pl2-name');
             data.Player2Pronouns = get_val('pl2-pronouns');
+            data.Player2WinCount = get_val('pl2-win-count');
             data.Player2Audio = get_checked('pl2-audio');
             data.Player3Name = get_val('pl3-name');
             data.Player3Pronouns = get_val('pl3-pronouns');
@@ -302,6 +304,32 @@
             <h1> MFH's Overlay Configuration </h1>
 
             <input style='flex-grow: 1;' onclick="submit();" type="button" value="Update">
+
+            <div class='vert'>
+                <h2> 1v1 Match results </h2>
+
+                <div class='hor'>
+                    <label for='pl1-win-count'> Player 1 Win Count: </label>
+                    <input id='pl1-win-count'
+                           name='pl1-win-count'
+                           type='number'
+                           min=''
+                           value=''
+                           step='1'>
+                </div>
+
+                <div class='hor'>
+                    <label for='pl2-win-count'> Player 2 Win Count: </label>
+                    <input id='pl2-win-count'
+                           name='pl2-win-count'
+                           type='number'
+                           min=''
+                           value=''
+                           step='1'>
+                </div>
+
+                <p> <small> Leave this empty to hide these fields </small> </p>
+            </div>
 
             <div class='vert'>
                 <h2> Player 1 ([Top] Left) </h2>

@@ -75,7 +75,10 @@ If any of these information is not given, then it won't take up any space in the
 The dimensions of the layout in the 1v1 layout are:
 
 * Top (racers) area's height: 100px (from `div.player`and `div.center-label`)
-    * Note that for the player name, this height is divided between the player name and optional pronouns
+    * Note that for the player name, this height is divided between the player name an optional header
+    * The header may contain the player's preferred pronouns and the win count
+    * Pronouns are always closer to the edge of the screen
+    * Win count is always closer to the middle of the screen
 * Top (racers) area's player width: 580px (from `div.player-flex`)
     * Prediction's width: 66px (from `p.predictions-flex`)
     * Audio note's width: 48px (from `p.audio-flex`)
