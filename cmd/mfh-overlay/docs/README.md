@@ -4,7 +4,9 @@ This time, let's do this right and start thing off documenting things as they ar
 
 ## About the overlay
 
-**TODO**
+For most purposes, just launch the server and access http://localhost:8088. This page will list most things you need  in OBS, or should access in a browser.
+
+For details on how to customize the overlay, check the [MFH's Restream Overlay](overlay.md) page.
 
 ## Dev guide
 

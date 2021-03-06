@@ -1,0 +1,149 @@
+html, body {
+    width: 1280px;
+    height: 720px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    color: #ffffff;
+    /* background-color: #400060; */
+    overflow: hidden;
+}
+
+html, body, div, p, img {
+    position: absolute;
+}
+
+div {
+    /* background-color: #80808080; */
+}
+
+img.pixelated {
+    /** Basic nearest-neighbour behaviour.
+     * Source: http://stackoverflow.com/questions/14068103/disable-antialising-when-scaling-images */
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated;                 /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}
+
+@font-face {
+    font-family: 'Regen';
+    src: url(/res/font/Regen.otf) format('opentype');
+}
+@font-face {
+    font-family: 'Regen';
+    font-weight: bold;
+    src: url(/res/font/Regen Bold.otf) format('opentype');
+}
+@font-face {
+    font-family: 'Regen';
+    font-style: italic;
+    src: url(/res/font/Regen Italic.otf) format('opentype');
+}
+@font-face {
+    font-family: 'Regen';
+    font-weight: bold;
+    font-style: italic;
+    src: url(/res/font/Regen Bold Italic.otf) format('opentype');
+}
+
+@font-face {
+    font-family: 'DS-DIGIT';
+    src: url(/res/font/DS-DIGIT.TTF) format('truetype');
+}
+@font-face {
+    font-family: 'DS-DIGIT';
+    font-weight: bold;
+    src: url(/res/font/DS-DIGIB.TTF) format('truetype');
+}
+@font-face {
+    font-family: 'DS-DIGIT';
+    font-style: italic;
+    src: url(/res/font/DS-DIGII.TTF) format('truetype');
+}
+
+p.mt-font {
+    font-family: 'Regen';
+    position: absolute;
+}
+
+div.timer {
+    width: 192px;
+    height: 42px;
+    bottom: 0;
+    background: black;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: baseline;
+}
+.timer {
+    font-family: 'DS-DIGIT';
+}
+span.timer {
+    display: inline-block;
+    font-size: 40px;
+    width: 20px;
+    height: 34px;
+    text-align: center;
+    margin: 0;
+}
+span.timer-sep {
+    width: 14px;
+}
+span.timer-small {
+    font-size: 26px;
+    width: 13px;
+}
+span.timer-small-sep {
+    width: 9px;
+}
+span#ms-ld {
+    margin-right: 8px;
+}
+
+.hidden {
+    visibility: hidden;
+    display: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 0;
+    height: 0;
+}
+img.tangible-progress {
+    position: absolute;
+    width: 288px;
+}
+
+div.goal {
+    width: 160px;
+    height: 104px;
+    justify-content: center;
+    position: absolute;
+    /* background-color: #00000000; */
+}
+div.goal-img {
+    position: relative;
+    display: inline-flex;
+    width: 100%;
+    flex-flow: row;
+}
+img.goal {
+    height: 72px;
+    position: relative;
+}
+p.goal {
+    width: auto;
+    font-size: 32px;
+    height: 32px;
+    margin-bottom: auto;
+    margin-top: auto;
+    text-align: center;
+    position: relative;
+    background-color: #00000080;
+    border-color: #00000080;
+}

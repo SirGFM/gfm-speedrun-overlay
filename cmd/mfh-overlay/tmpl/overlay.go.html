@@ -1,0 +1,289 @@
+<html>
+    <head>
+        <title> MFH's Restream Overlay </title>
+        <meta charset="utf-8" name="viewport" content="width=1280, height=720, initial-scale=1" />
+
+        <link rel="stylesheet" href="/res/style/common.css">
+        {{if .Layout2v2}}
+            <link rel="stylesheet" href="/res/style/2v2.css">
+        {{else}}
+            <link rel="stylesheet" href="/res/style/1v1.css">
+        {{end}}
+
+        <script type="text/javascript" src="/res/script/auto_resize.js"></script>
+        <script type="text/javascript" src="/res/script/conn.js"></script>
+        {{if .HasTimer}}
+            <script type="text/javascript" src="/res/script/timer.js"></script>
+        {{end}}
+        {{if .AutoUpdate}}
+            <script type="text/javascript" src="/res/script/auto_reload.js"></script>
+        {{end}}
+        {{if .HasPopup}}
+            <script type="text/javascript" src="/res/script/popup.js"></script>
+        {{end}}
+        <script>
+            {{if or .AutoUpdate .HasTimer .HasPopup}}
+                /**
+                 * Register an update function, called every
+                 * {{.ScriptRefresh}} milliseconds, after the page is done
+                 * loading.
+                 */
+                document.addEventListener("DOMContentLoaded", function (event) {
+                    window.setInterval(function() {
+                        {{if .AutoUpdate}}
+                            auto_reload.update();
+                        {{end}}
+                        {{if .HasTimer}}
+                            timer.update();
+                        {{end}}
+                        {{if .HasPopup}}
+                            popup.update();
+                        {{end}}
+                    }, {{.ScriptRefresh}});
+                });
+            {{end}}
+        </script>
+    </head>
+    <body>
+        <!-- Empty div used so others may compute their length more easily -->
+        <div id='empty' style='width: 0; height: 0;'> </div>
+
+        <!-- Main area where everything is placed at -->
+        <div id='view' style='width: 1280; height: 720;'>
+
+            <!--
+              - Top area with:
+              -   * Player's names
+              -   * (1v1 layout, opt) Predictions
+              -   * (opt) Currently used audio
+              -   * (2v2 layout, opt) Round for the current 
+              - By default, the width of any given player DIV is such that
+              - there's enough space to put a logo/image between them.
+              -->
+            <div id='top' class='player'>
+                <div id='top-pl-1' class='player-flex'>
+                    {{if .Player1Audio}}
+                    <p id='pl1-audio' class='mt-font audio-flex center-label'>
+                        <!-- Copied from http://www.i2symbol.com/symbols/music
+                          - ♩ - ♪ - ♫ - ♬ - ♭ - ♮ - ♯ - 🎼 - 🎵 - 🎶
+                          - 🎤 - 🎧 - 📻 - 🎷 - 🎸 - 🎹 - 🎺 - 🎻
+                          -->
+                        ♬
+                    </p>
+                    {{end}}
+                    <p id='pl1-name' class='mt-font player-flex center-label resize'>
+                        {{.Player1Name}}
+                    </p>
+                    {{if not .Layout2v2}}
+                        {{if .ShowPredictions}}
+                            <p id='pl1-predictions' class='mt-font predictions-flex center-label'>
+                                {{.Player1Predictions}}%
+                            </p>
+                        {{end}}
+                    {{end}}
+                </div> <!-- id: top-pl1-name -->
+
+                {{if .Layout2v2}}
+                    <p id='top-round' class='mt-font round center-label resize'>
+                        {{.TopRound}}
+                    </p>
+                {{end}}
+
+                <div id='top-pl-2' class='player-flex'>
+                    {{if not .Layout2v2}}
+                        {{if .ShowPredictions}}
+                            <p id='pl2-predictions' class='mt-font predictions-flex center-label'>
+                                {{.Player2Predictions}}%
+                            </p>
+                        {{end}}
+                    {{end}}
+                    <p id='pl2-name' class='mt-font player-flex center-label resize'>
+                        {{.Player2Name}}
+                    </p>
+                    {{if .Player2Audio}}
+                    <p id='pl2-audio' class='mt-font audio-flex center-label'>
+                        ♬
+                    </p>
+                    {{end}}
+                </div> <!-- id: top-pl-2 -->
+            </div> <!-- id: top -->
+
+            {{if .Layout2v2}}
+            <div id='bottom' class='player'>
+                <div id='top-pl-3' class='player-flex'>
+                    {{if .Player3Audio}}
+                    <p id='pl3-audio' class='mt-font audio-flex center-label'>
+                        ♬
+                    </p>
+                    {{end}}
+                    <p id='pl3-name' class='mt-font player-flex center-label resize'>
+                        {{.Player3Name}}
+                    </p>
+                </div> <!-- top-pl-3 -->
+
+                <p id='bottom-round' class='mt-font round center-label resize'>
+                    {{.BottomRound}}
+                </p>
+
+                <div id='top-pl-4' class='player-flex'>
+                    <p id='pl4-name' class='mt-font player-flex center-label resize'>
+                        {{.Player4Name}}
+                    </p>
+                    {{if .Player4Audio}}
+                    <p id='pl4-audio' class='mt-font audio-flex center-label'>
+                        ♬
+                    </p>
+                    {{end}}
+                </div> <!-- top-pl-4 -->
+            </div>
+            {{end}}
+
+            <div id='info' class='info'>
+                {{if not .Layout2v2}}
+                    <p id='round' class='mt-font'>
+                        {{.TopRound}}
+                    </p>
+                {{end}}
+
+                {{if not .Layout2v2}}
+                <div id='left-info' class='info-box'>
+                {{end}}
+                    {{if .Game}}
+                    <p id='game' class='mt-font info resize'>
+                        {{.Game}}
+                    </p>
+                    {{end}}
+
+                    {{if .Goal}}
+                    <p id='goal' class='mt-font info resize'>
+                        {{.Goal}}
+                    </p>
+                    {{end}}
+                {{if not .Layout2v2}}
+                </div> <!-- left-info -->
+
+                <div id='info-padding' class='info-box'> </div>
+
+                <div id='right-info' class='info-box'>
+                {{end}}
+                    {{if .Platform}}
+                    <p id='platform' class='mt-font info resize'>
+                        {{.Platform}}
+                    </p>
+                    {{end}}
+
+                    {{if .Description}}
+                    <p id='subbed-by' class='mt-font info resize'>
+                        {{if .DescriptionLabel}}
+                            <label id='subbed-by'> {{.DescriptionLabel}} </br> </label>
+                        {{end}}
+                        {{.Description}}
+                    </p>
+                    {{end}}
+                {{if not .Layout2v2}}
+                </div> <!-- right-info -->
+                {{end}}
+
+            </div> <!-- info -->
+
+            <div class='logo'>
+                {{if not .HideTopLogo}}
+                    <img id='top-logo' class='logo' src='/res/img/Mystery Ghost.png'>
+                {{end}}
+                {{if not .HideBottomLogo}}
+                    <img id='bottom-logo' class='logo' src='/res/img/mt15logo.png'>
+                {{end}}
+            </div>
+
+            {{if .Player1Won}}
+                <div id='pl1-win' class='goal top-goal'>
+                    {{if .Layout2v2}}
+                        <div id='pl1-win-img' class='goal-img'>
+                            <img id='pl1-win' class='goal pixelated' src='/res/img/baba-is-win.gif'>
+                        </div>
+                    {{end}}
+                    {{if .Player1Time}}
+                        <p id='pl1-goal-time' class='goal timer'>
+                            {{.Player1Time}}
+                        </p>
+                    {{end}}
+                    {{if not .Layout2v2}}
+                        <div id='pl1-win-img' class='goal-img'>
+                            <img id='pl1-win' class='goal pixelated' src='/res/img/baba-is-win.gif'>
+                        </div>
+                    {{end}}
+                </div> <!-- 'pl1-win' -->
+            {{end}}
+            {{if .Player2Won}}
+                <div id='pl2-win' class='goal top-goal'>
+                    {{if .Layout2v2}}
+                        <div id='pl2-win-img' class='goal-img'>
+                            <img id='pl2-win' class='goal pixelated' src='/res/img/baba-is-win.gif'>
+                        </div>
+                    {{end}}
+                    {{if .Player2Time}}
+                        <p id='pl2-goal-time' class='goal timer'>
+                            {{.Player2Time}}
+                        </p>
+                    {{end}}
+                    {{if not .Layout2v2}}
+                        <div id='pl2-win-img' class='goal-img'>
+                            <img id='pl2-win' class='goal pixelated' src='/res/img/baba-is-win.gif'>
+                        </div>
+                    {{end}}
+                </div> <!-- 'pl2-win' -->
+            {{end}}
+            {{if .Layout2v2}}
+                {{if .Player3Won}}
+                    <div id='pl3-win' class='goal bottom-goal'>
+                        {{if .Player3Time}}
+                            <p id='pl3-goal-time' class='goal timer'>
+                                {{.Player3Time}}
+                            </p>
+                        {{end}}
+                        <div id='pl3-win-img' class='goal-img'>
+                            <img id='pl3-win' class='goal pixelated' src='/res/img/baba-is-win.gif'>
+                        </div>
+                    </div> <!-- 'pl3-win' -->
+                {{end}}
+                {{if .Player4Won}}
+                    <div id='pl4-win' class='goal bottom-goal'>
+                        {{if .Player4Time}}
+                            <p id='pl4-goal-time' class='goal timer'>
+                                {{.Player4Time}}
+                            </p>
+                        {{end}}
+                        <div id='pl4-win-img' class='goal-img'>
+                            <img id='pl4-win' class='goal pixelated' src='/res/img/baba-is-win.gif'>
+                        </div>
+                    </div> <!-- 'pl4-win' -->
+                {{end}}
+            {{end}}
+
+            {{if .HasPopup}}
+                <img class='tangible-progress pixelated hidden' id='pl1-tp' src='/res/img/tp.gif'>
+                <img class='tangible-progress pixelated hidden' id='pl2-tp' src='/res/img/tp.gif'>
+                {{if .Layout2v2}}
+                <img class='tangible-progress pixelated hidden' id='pl3-tp' src='/res/img/tp.gif'>
+                <img class='tangible-progress pixelated hidden' id='pl4-tp' src='/res/img/tp.gif'>
+                {{end}}
+            {{end}}
+
+            {{if .HasTimer}}
+                <div class='timer'>
+                    <span style='visibility: hidden' class='timer' id='hour-hd'>0</span>
+                    <span style='visibility: hidden' class='timer' id='hour-ld'>0</span>
+                    <span style='visibility: hidden' class='timer timer-sep' id='min-colon'>:</span>
+                    <span style='visibility: hidden' class='timer' id='min-hd'>0</span>
+                    <span style='visibility: hidden' class='timer' id='min-ld'>0</span>
+                    <span style='visibility: hidden' class='timer timer-sep' id='s-colon'>:</span>
+                    <span style='visibility: hidden' class='timer' id='s-hd'>0</span>
+                    <span class='timer' id='s-ld'>0</span>
+                    <span class='timer timer-small timer-small-sep' id='ms-dot'>.</span>
+                    <span class='timer timer-small' id='ms-hd'>0</span>
+                    <span class='timer timer-small' id='ms-ld'>0</span>
+                </div>
+            {{end}}
+        </div> <!-- id: view -->
+    </body>
+</html>
