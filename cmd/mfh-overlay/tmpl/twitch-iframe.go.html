@@ -26,6 +26,11 @@
                 overflow: hidden;
             }
         </style>
+
+        <script>
+            /** Work around for Twitch's "Purple Screen of Death" (limitations for embedded) */
+            window.location.replace('https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false')
+        </script>
     </head>
     <body>
         <iframe
