@@ -71,9 +71,16 @@
                         ♬
                     </p>
                     {{end}}
-                    <p id='pl1-name' class='mt-font player-flex center-label resize'>
-                        {{.Player1Name}}
-                    </p>
+                    <div id='top-pl1-name' class='player-name-flex'>
+                        {{if .Player1Pronouns}}
+                            <p id='pl1-pronouns' class='mt-font player-pronouns resize'>
+                                {{.Player1Pronouns}}
+                            </p>
+                        {{end}}
+                        <p id='pl1-name' class='mt-font player-flex resize'>
+                            {{.Player1Name}}
+                        </p>
+                    </div> <!-- id: top-pl1-name -->
                     {{if not .Layout2v2}}
                         {{if .ShowPredictions}}
                             <p id='pl1-predictions' class='mt-font predictions-flex center-label'>
@@ -81,7 +88,7 @@
                             </p>
                         {{end}}
                     {{end}}
-                </div> <!-- id: top-pl1-name -->
+                </div> <!-- id: top-pl-1 -->
 
                 {{if .Layout2v2}}
                     <p id='top-round' class='mt-font round center-label resize'>
@@ -97,9 +104,25 @@
                             </p>
                         {{end}}
                     {{end}}
-                    <p id='pl2-name' class='mt-font player-flex center-label resize'>
-                        {{.Player2Name}}
-                    </p>
+                    <div id='top-pl2-name' class='player-name-flex'>
+                        {{if not .Layout2v2}}
+                            {{if .Player2Pronouns}}
+                                <p id='pl2-pronouns' class='mt-font player-pronouns resize'>
+                                    {{.Player2Pronouns}}
+                                </p>
+                            {{end}}
+                        {{end}}
+                        <p id='pl2-name' class='mt-font player-flex resize'>
+                            {{.Player2Name}}
+                        </p>
+                        {{if .Layout2v2}}
+                            {{if .Player2Pronouns}}
+                                <p id='pl2-pronouns' class='mt-font player-pronouns resize'>
+                                    {{.Player2Pronouns}}
+                                </p>
+                            {{end}}
+                        {{end}}
+                    </div> <!-- id: top-pl2-name -->
                     {{if .Player2Audio}}
                     <p id='pl2-audio' class='mt-font audio-flex center-label'>
                         ♬
@@ -116,9 +139,17 @@
                         ♬
                     </p>
                     {{end}}
-                    <p id='pl3-name' class='mt-font player-flex center-label resize'>
-                        {{.Player3Name}}
-                    </p>
+
+                    <div id='top-pl3-name' class='player-name-flex'>
+                        {{if .Player3Pronouns}}
+                            <p id='pl3-pronouns' class='mt-font player-pronouns resize'>
+                                {{.Player3Pronouns}}
+                            </p>
+                        {{end}}
+                        <p id='pl3-name' class='mt-font player-flex resize'>
+                            {{.Player3Name}}
+                        </p>
+                    </div> <!-- id: top-pl3-name -->
                 </div> <!-- top-pl-3 -->
 
                 <p id='bottom-round' class='mt-font round center-label resize'>
@@ -126,9 +157,17 @@
                 </p>
 
                 <div id='top-pl-4' class='player-flex'>
-                    <p id='pl4-name' class='mt-font player-flex center-label resize'>
-                        {{.Player4Name}}
-                    </p>
+                    <div id='top-pl4-name' class='player-name-flex'>
+                        <p id='pl4-name' class='mt-font player-flex resize'>
+                            {{.Player4Name}}
+                        </p>
+                        {{if .Player4Pronouns}}
+                            <p id='pl4-pronouns' class='mt-font player-pronouns resize'>
+                                {{.Player4Pronouns}}
+                            </p>
+                        {{end}}
+                    </div> <!-- id: top-pl3-name -->
+
                     {{if .Player4Audio}}
                     <p id='pl4-audio' class='mt-font audio-flex center-label'>
                         ♬

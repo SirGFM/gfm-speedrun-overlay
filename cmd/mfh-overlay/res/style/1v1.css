@@ -24,6 +24,19 @@ div.player-flex {
     /* background-color: #a0000080; */
 }
 
+/* Div with the name and pronoun single player */
+div.player-name-flex {
+    display: inline-flex;
+    flex-flow: column;
+    flex-grow: 1;
+    height: 100px;
+    max-height: 100px;
+    justify-content: space-around;
+    position: relative;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 /* Magically center labels */
 p.center-label {
     height: 100px;
@@ -34,16 +47,25 @@ p.center-label {
 }
 
 /* Properly position labels in the top row */
-p.player-flex {
-    margin-left: 10px;
-    margin-right: 10px;
+p.player-pronouns {
+    font-size: 24px;
     position: relative;
-    font-size: 42px;
-    /* Ensure that the player's label may take as much space as available
-     * (in case some elements are hidden in the overlay */
-    flex-grow: 1;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 1em;
+    margin-right: 1em;
+    max-height: 20px;
 }
-p#pl2-name {
+
+/* Properly position labels in the top row */
+p.player-flex {
+    margin-top: 0;
+    margin-bottom: 0;
+    position: relative;
+    font-size: 64px;
+    max-height: 80px;
+}
+p#pl2-name, p#pl2-pronouns {
     /* Right-align player 2 */
     text-align: end;
 }

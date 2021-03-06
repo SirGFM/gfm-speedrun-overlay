@@ -34,21 +34,47 @@ p.center-label {
     margin: 0;
 }
 
-/* Properly position player labels */
-p.player-flex {
+/* Div with the name and pronoun single player */
+div.player-name-flex {
+    display: inline-flex;
+    flex-flow: row;
+    flex-grow: 1;
+    height: 26px;
+    max-height: 26px;
+    justify-content: flex-start;
+    align-items: flex-end;
+    position: relative;
     margin-left: 4px;
     margin-right: 4px;
-    position: relative;
-    font-size: 20px;
-    /* Ensure that the player's label may take as much space as available
-     * (in case some elements are hidden in the overlay */
-    flex-grow: 1;
+}
+div#top-pl3-name, div#top-pl4-name {
+    align-items: flex-start;
+}
 
+/* Properly position labels in the top row */
+p.player-pronouns {
+    font-size: 16px;
+    position: relative;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 2px;
+    margin-right: 2px;
+    max-height: 26px;
+}
+
+/* Properly position player labels */
+p.player-flex {
+    position: relative;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 24px;
+    max-height: 26px;
     /* background-color: #a0000080; */
 }
-p#pl2-name, p#pl4-name {
-    /* Right-align player 2 and 4 */
-    text-align: end;
+
+/* Right-align player 2 and 4 */
+div#top-pl2-name, div#top-pl4-name {
+    justify-content: flex-end;
 }
 
 p.audio-flex {
