@@ -163,6 +163,7 @@
             data.ScriptRefresh = get_val('refresh-rate');
             data.HideTopLogo = get_checked('hide-top-logo');
             data.HideBottomLogo = get_checked('hide-bottom-logo');
+            data.HideBG = get_checked('hide-bg');
 
             send_with_errors('/tmpl/overlay.go.html', data);
 
@@ -556,6 +557,11 @@
                 <div class='hor'>
                     <input class='checkbox' type='checkbox' id='hide-bottom-logo' name='hide-bottom-logo'>
                     <label class='checkbox' for='hide-bottom-logo'> Hide bottom/right logo (usually the event logo) </label>
+                </div>
+
+                <div class='hor'>
+                    <input class='checkbox' type='checkbox' id='hide-bg' name='hide-bg'>
+                    <label class='checkbox' for='hide-bg'> Hide the background (for customizable *fun*) </label>
                 </div>
 
                 <div class='hor'>

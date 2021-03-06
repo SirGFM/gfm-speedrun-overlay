@@ -44,7 +44,11 @@
             {{end}}
         </script>
     </head>
-    <body>
+    <body
+        {{if .HideBG}}
+        class='no-bg'
+        {{end}}
+            >
         <!-- Empty div used so others may compute their length more easily -->
         <div id='empty' style='width: 0; height: 0;'> </div>
 

@@ -4,6 +4,10 @@ body {
     background-repeat: no-repeat;
 }
 
+body.no-bg {
+    background: none;
+}
+
 /* === TOP PART ============================================================= */
 
 /* Div that spans the entire top */
