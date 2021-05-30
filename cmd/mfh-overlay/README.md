@@ -6,10 +6,6 @@ This tool is in no way official (as my version of the MT overlay wasn't), but it
 
 ## Features
 
-Soon...
-
-## Possible future features
-
 * Simplified interface for customizing the broadcast skin
 * Up to 4 slots for racers, with:
     * Optional slot for audio icon
@@ -21,7 +17,12 @@ Soon...
 * Built-in timer (for those like me that don't like using LiveSplit)
 * Automatically shrinking text individually for fitting labels
     * Using this race as reference: https://www.twitch.tv/videos/344872865?collection=A4bL_e-gahV_JA
+* Custom GIAN2OOPA overlay, with a growing turtle in the background
+
+## Possible future features
+
 * Built-in SRL integration (mostly for weekly races, I guess...)
+* Mystery Tournament carrer title-card integration
 
 ## Usage
 
