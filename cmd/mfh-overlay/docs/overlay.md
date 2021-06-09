@@ -130,14 +130,14 @@ This overlay uses two fonts:
 * [Regen](https://www.dafont.com/regen.font)
 * [DS-Digital](https://www.dafont.com/ds-digital.font)
 
-Simply download these fonts and place them in `./res/font/`. Currently, the overlay expect the following modes to be available
+Simply download these fonts and place them in `./res/priv/font/`. Currently, the overlay expect the following modes to be available
 
-* Regen default: `/res/font/Regen.otf`
-* Regen bold: `/res/font/Regen Bold.otf`
-* Regen italic: `/res/font/Regen Italic.otf`
-* Regen bold italic: `/res/font/Regen Bold Italic.otf`
-* DS-Digital default: `/res/font/DS-DIGIT.TTF`
+* Regen default: `/res/priv/font/Regen.otf`
+* Regen bold: `/res/priv/font/Regen Bold.otf`
+* Regen italic: `/res/priv/font/Regen Italic.otf`
+* Regen bold italic: `/res/priv/font/Regen Bold Italic.otf`
+* DS-Digital default: `/res/priv/font/DS-DIGIT.TTF`
     * (although this is most likely the "bold italic" version...)
-* DS-Digital bold: `/res/font/DS-DIGIB.TTF`
-* DS-Digital italic: `/res/font/DS-DIGII.TTF`
+* DS-Digital bold: `/res/priv/font/DS-DIGIB.TTF`
+* DS-Digital italic: `/res/priv/font/DS-DIGII.TTF`
 

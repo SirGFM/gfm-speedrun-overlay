@@ -10,7 +10,7 @@ html, body {
 }
 
 body {
-    background: url('/res/img/racer-card.png');
+    background: url('/res/priv/img/racer-card.png');
     background-repeat: no-repeat;
     width: 475px;
     height: 475px;

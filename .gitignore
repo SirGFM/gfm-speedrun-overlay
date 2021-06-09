@@ -13,3 +13,8 @@
 *.so
 *.swp
 *.exe
+
+# Also ignore files private to the mfh-overlay
+cmd/mfh-overlay/credentials.json
+cmd/mfh-overlay/token.json
+cmd/mfh-overlay/res/priv/

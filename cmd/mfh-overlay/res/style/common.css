@@ -31,38 +31,38 @@ img.pixelated {
 
 @font-face {
     font-family: 'Regen';
-    src: url(/res/font/Regen.otf) format('opentype');
+    src: url(/res/priv/font/Regen.otf) format('opentype');
 }
 @font-face {
     font-family: 'Regen';
     font-weight: bold;
-    src: url(/res/font/Regen Bold.otf) format('opentype');
+    src: url(/res/priv/font/Regen Bold.otf) format('opentype');
 }
 @font-face {
     font-family: 'Regen';
     font-style: italic;
-    src: url(/res/font/Regen Italic.otf) format('opentype');
+    src: url(/res/priv/font/Regen Italic.otf) format('opentype');
 }
 @font-face {
     font-family: 'Regen';
     font-weight: bold;
     font-style: italic;
-    src: url(/res/font/Regen Bold Italic.otf) format('opentype');
+    src: url(/res/priv/font/Regen Bold Italic.otf) format('opentype');
 }
 
 @font-face {
     font-family: 'DS-DIGIT';
-    src: url(/res/font/DS-DIGIT.TTF) format('truetype');
+    src: url(/res/priv/font/DS-DIGIT.TTF) format('truetype');
 }
 @font-face {
     font-family: 'DS-DIGIT';
     font-weight: bold;
-    src: url(/res/font/DS-DIGIB.TTF) format('truetype');
+    src: url(/res/priv/font/DS-DIGIB.TTF) format('truetype');
 }
 @font-face {
     font-family: 'DS-DIGIT';
     font-style: italic;
-    src: url(/res/font/DS-DIGII.TTF) format('truetype');
+    src: url(/res/priv/font/DS-DIGII.TTF) format('truetype');
 }
 
 p.mt-font {
