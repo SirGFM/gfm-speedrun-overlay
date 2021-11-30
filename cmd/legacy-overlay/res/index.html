@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title> GFM's Gaming Arena </title>
+        <meta charset="utf-8" name="viewport" content="width=1280, height=720, initial-scale=1" />
+        <meta name="keywords" content="stream,skin" />
+        <meta name="description" content="GFM's streaming skin" />
+        <meta name="author" content="Gabriel Francisco Mandaji" />
+
+        <style>
+            @font-face {
+                /** m5x7 by Daniel Linssen. Get it from https://managore.itch.io/m5x7. */
+                font-family: "m5x7";
+                src: url(/res/m5x7.ttf) format("truetype");
+            }
+            html, body {
+                width: 1280px;
+                height: 720px;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                background-color: #222034;
+                background-image: url('/img/bg.png');
+                color: #cbdbfc;
+                font-size: 1em;
+            }
+            img {
+                /** Basic nearest-neighbour behaviour.
+                 * Source: http://stackoverflow.com/questions/14068103/disable-antialising-when-scaling-images */
+                image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+                image-rendering: -moz-crisp-edges;          /* Firefox                        */
+                image-rendering: -o-crisp-edges;            /* Opera                          */
+                image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+                image-rendering: pixelated;                 /* Chrome */
+                image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+                -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+            }
+            .configButton {
+                background-image: url('/img/config/default.png');
+                width: 32px;
+                height: 32px;
+                border: 0;
+            }
+            .configButton:hover {
+                background-image: url('/img/config/hover.png');
+            }
+            .configButton:active {
+                background-image: url('/img/config/press.png');
+            }
+            .m5x7 {
+                font-family: "m5x7";
+                font-size: 48px;
+                display: block;
+                overflow: hidden;
+                word-break: break-all;
+            }
+            .centered {
+                text-align: center;
+            }
+            .split {
+                font-size: 16px;
+                display: inline-block;
+                line-height: 36px;
+                vertical-align: middle;
+            }
+            .splitLabel {
+                text-align: left;
+                width: 133px;
+                padding-left: 1px;
+            }
+            .splitDiff {
+                text-align: center;
+                width: 40px;
+            }
+            .splitTime {
+                text-align: right;
+                font-size: 24px;
+                width: 65px;
+            }
+            .outlined {
+                text-shadow: -1px -1px 0 #000,
+                              1px -1px 0 #000,
+                             -1px  1px 0 #000,
+                              1px  1px 0 #000;  
+            }
+            .gameInfo {
+                font-size: 24px;
+                bottom: 0;
+                left: 0;
+            }
+            .fixedRoot {
+                /* Fixed position (unchanged by viewport size). Can be used as
+                 * parent for other elements */
+                position: fixed;
+            }
+            .fixedChild {
+                /* Fixed position (unchanged by viewport size), but contained
+                 * and relative to its closest parent. */
+                position: absolute;
+            }
+            .darkBg {
+                background-color: #000000;
+                opacity: 0.75;
+            }
+            .highlightedBg {
+                background-color: #3f3f74;
+                opacity: 0.75;
+            }
+            .gameDiv {
+                outline: 2px solid #639bff;
+                top: 8px;
+            }
+            .gameColorkey {
+                background-color: #000000;
+                /* The color bellow is useful for testing... */
+                /** background-color: #ff00ff; /**/
+                opacity: 1;
+                outline: 4px solid #000000;
+            }
+            .line {
+                background-color: #639bff;
+                height: 2px;
+                width: auto;
+            }
+        </style>
+
+        <script type="text/javascript" src="/script/box.js"></script>
+        <script type="text/javascript" src="/script/conn.js"></script>
+        <script type="text/javascript" src="/script/gamepad.js"></script>
+        <script type="text/javascript" src="/script/keyboardListener.js"></script>
+        <script type="text/javascript" src="/script/utils.js"></script>
+        <script type="text/javascript" src="/script/text.js"></script>
+        <script type="text/javascript" src="/script/timer.js"></script>
+        <script type="text/javascript" src="/script/splits.js"></script>
+        <script type="text/javascript" src="/script/display.js"></script>
+        <script>
+            /* How much bigger the title's border should be */
+            const _borderInc = 1.1;
+            /* (duplicated) Window height */
+            const _winHeight = 720;
+            /* Whether the vertical position of the label should be set at a later time */
+            let _setLabelLate = false;
+            /* Nespad context, if any */
+            let _nespadCtx = null;
+            /* Array of keys used by the nespad */
+            let _nespadKeys = [];
+
+            /**
+             * Bootstrap, after the page is loaded
+             */
+            document.addEventListener("DOMContentLoaded", function (event) {
+                setupGetLabelLength("m5x7 outlined");
+                window.setTimeout(bootstrap, 100)
+            })
+
+            /**
+             * Parse the arguments
+             */
+            function parseArgs() {
+                let args = {}
+                let parsedArgs = parseURL(window.location.href);
+
+                if ("gameConsole" in parsedArgs) {
+                    args.display = {
+                        type: "console",
+                        mode: parsedArgs.gameConsole
+                    };
+                }
+                else {
+                    let w = 0, h = 0;
+
+                    if ("gameWidth" in parsedArgs) {
+                        w = parseInt(parsedArgs.gameWidth);
+                    }
+                    if ("gameHeight" in parsedArgs) {
+                        h = parseInt(parsedArgs.gameHeight);
+                    }
+
+                    args.display = {
+                        type: "custom",
+                        width: w,
+                        height: h,
+                    };
+                }
+
+                if ("gameTitle" in parsedArgs) {
+                    args.title = parsedArgs.gameTitle.replace(/%20/g, " ");
+                }
+                else {
+                    args.title = "Game Title";
+                }
+
+                if ("timerButton" in parsedArgs) {
+                    args.timer = {
+                        control: parsedArgs.timerButton
+                    };
+                }
+                else {
+                    args.timer = {
+                        control: "l2"
+                    };
+                }
+
+                if ("nogamepad" in parsedArgs) {
+                    args.input = {
+                        gamepad: false
+                    };
+                }
+                else {
+                    args.input = {
+                        gamepad: true
+                    };
+                }
+
+                return args;
+            }
+
+            /**
+             * Bootstrap, after the page is loaded
+             */
+            function bootstrap() {
+                /* Setup the hook so pressing the button will load a file */
+                let _input = document.getElementById("configInput");
+                _input.addEventListener("change", loadJsonFile);
+
+                initialTimerSetup();
+                gamepad.setup(document.getElementById('gamepad-view'), 'xbox');
+
+                /* Get every key used by the nespad (in the correct order) */
+                _nespadKeys.push(document.getElementById("nespad_left"));
+                _nespadKeys.push(document.getElementById("nespad_right"));
+                _nespadKeys.push(document.getElementById("nespad_up"));
+                _nespadKeys.push(document.getElementById("nespad_down"));
+                _nespadKeys.push(document.getElementById("nespad_b"));
+                _nespadKeys.push(document.getElementById("nespad_a"));
+                _nespadKeys.push(document.getElementById("nespad_select"));
+                _nespadKeys.push(document.getElementById("nespad_start"));
+
+                /* Initial setup from query string */
+                setupScreen(parseArgs());
+            }
+
+            /**
+             * Set the title and configure its border.
+             *
+             * @param{title} The game's title
+             */
+            function setTitle(title) {
+                let x, y = 0, w, h;
+
+                /* Add a dummy title to calculate its position */
+                addLine('title', title, 'fixedChild m5x7 outlined centered', maxBorderWidth=1024, isBoxed=true);
+
+                w = getLineWidth('title');
+                h = getLineHeight('title');
+
+                if (h >= getUnderView()) {
+                    /* Place it on the left side of the screen */
+                    if (getLeftView() >= w)
+                        x = getValidDimension((getLeftView() - w) * 0.5);
+                    else {
+                        x = 0;
+                        addLine('title', title, 'fixedChild m5x7 outlined centered', maxBorderWidth=getLeftView(), isBoxed=true);
+                    }
+
+                    /* Vertical position will be set later */
+                    _setLabelLate = true;
+                }
+                else {
+                    let _view = getViewInfo();
+                    /* Center it bellow the game view */
+                    x = getValidDimension((_view.width - w) * 0.5);
+                    x += _view.x;
+
+                    /* Place it in the upper quarter of the bottom of the screen */
+                    y = _view.y + _view.height;
+                    y = getValidDimension(y + getUnderView() * 0.25);
+                    if (y + h > document.body.clientHeight) {
+                        y = _view.y + _view.height;
+                        y = getValidDimension(y + (getUnderView() - h) * 0.5);
+                    }
+                }
+
+                setLinePosition('title', x, y);
+            }
+
+            /**
+             * Called from 'loadConfigButton', simply clicks on 'configInput' to
+             * get a file selector UI.
+             */
+            function setupLoadFile() {
+                document.getElementById("configInput").click();
+            }
+
+            /**
+             * Loads a JSON file as the page's configuration. Called as
+             * 'configInput's handler.
+             */
+            function loadJsonFile() {
+                if (this.files.length <= 0) {
+                    alert("No file selected!");
+                    return;
+                }
+
+                /* NOTE: OBS on Windows does not report JSON files with the
+                 * proper MIME type. */
+                let _file = this.files[0];
+                if (_file.type != "" && _file.type != "application/json") {
+                    alert("Invalid file type! Expected a JSON file.");
+                    return;
+                }
+
+                let _reader = new FileReader();
+                _reader.onload = function (e) { setupScreen(JSON.parse(e.target.result)); };
+                _reader.readAsText(_file);
+            }
+
+            /**
+             * Configure the timer border.
+             */
+            function initialTimerSetup() {
+                /* Set the timer's label */
+                addLine('timer', '00:00:00.000', 'fixedChild m5x7 outlined centered', maxBorderWidth=1024, isBoxed=true);
+                setupTimer(getLineLabel('timer'));
+            }
+
+            /**
+             * Configure input visibility, and assign keys to the keyboard view
+             * (if any).
+             */
+            function configureInput(input) {
+                let gamepadView = document.getElementById("gamepad-view");
+                let nespad = document.getElementById("nespad-view");
+
+                let setPad = function(pad, name) {
+                    if (!(name in input) || !input[name]) {
+                        input[name] = false;
+                        pad.style.visibility = "hidden";
+                    }
+                    else {
+                        pad.style.visibility = "visible";
+                    }
+                }
+
+                if (!('gamepad' in input) || !input['gamepad']) {
+                    input['gamepad'] = 'false';
+                    gamepadView.style.visibility = "hidden";
+                }
+                else {
+                    gamepadView.style.visibility = "visible";
+                    gamepad.setup(gamepadView, input['gamepad']);
+                }
+                setPad(nespad, "nespad");
+
+                if (("nespad" in input) && input.nespad) {
+                    if (_nespadCtx != null) {
+                        _nespadCtx.close();
+                    }
+                    _nespadCtx = setupNewKeypad(_nespadKeys, input.nespad);
+                }
+                else {
+                    input.nespad = null;
+                }
+            }
+
+            function calculateNonSplitHeight(config) {
+                let gamepad = document.getElementById("gamepad-view");
+                let nespad = document.getElementById("nespad-view");
+                let els = [];
+                let maxH = 0;
+
+                els.push('timer');
+                if (config.input.gamepad) {
+                    els.push(gamepad);
+                }
+                if (config.input.nespad) {
+                    els.push(nespad);
+                }
+                if (_setLabelLate) {
+                    els.push('title');
+                }
+
+                /* Calculate the accumulated height of every element, and the
+                 * distance between elements. */
+                for (let i in els) {
+                    if (typeof(els[i]) === 'string')
+                        maxH += getLineHeight(els[i]);
+                    else
+                        maxH += getIntegerAttr(els[i], "offsetHeight");
+                }
+                maxH = getValidDimension(maxH * 1.1);
+
+                /* Calculate the initial pos and distance between objects */
+                return _winHeight - maxH;
+            }
+
+            /**
+             * Center the left side of the screen
+             */
+            function centerLeftView(config) {
+                let gamepad = document.getElementById("gamepad-view");
+                let nespad = document.getElementById("nespad-view");
+                let els = [];
+                let maxH = 0, top = 0, dist = 0;
+
+                /* Add every object that must be centralized to a list. The
+                 * inclusion order defines which object is at the top!! */
+                if (isSplitsVisible()) {
+                    maxH = getBoxHeightById('splitsDiv');
+                }
+                els.push('timer');
+                if (config.input.gamepad) {
+                    els.push(gamepad);
+                }
+                if (config.input.nespad) {
+                    els.push(nespad);
+                }
+                if (_setLabelLate) {
+                    els.push('title');
+                }
+
+                /* Calculate the accumulated height of every element, and the
+                 * distance between elements. */
+                for (let i in els) {
+                    if (typeof(els[i]) === 'string')
+                        maxH += getLineHeight(els[i]);
+                    else
+                        maxH += getIntegerAttr(els[i], "offsetHeight");
+                }
+                let div = els.length;
+                if (isSplitsVisible())
+                    div++;
+                dist = getValidDimension((_winHeight - maxH) / div);
+                if (dist > 24)
+                    dist = 24;
+                maxH += dist * (div - 1);
+
+                /* Calculate the initial pos and distance between objects */
+                top = getValidDimension((_winHeight - maxH) * 0.5);
+
+                /* Set each object's position */
+                if (isSplitsVisible()) {
+                    let left = getBoxWidthById('splitsDiv');
+                    left = getValidDimension((getLeftView() - left) * 0.5);
+                    setBoxPositionById('splitsDiv', left, top);
+                    top += getBoxHeightById('splitsDiv') + dist;
+                }
+
+                for (let i in els) {
+                    let el = els[i];
+                    if (typeof(el) === 'string') {
+                        let left = getLineWidth(el);
+                        left = getValidDimension((getLeftView() - left) * 0.5);
+                        setLinePosition(el, left, top);
+                        top += getLineHeight(el) + dist;
+                        continue;
+                    }
+
+                    let left = getIntegerAttr(el, "offsetWidth");
+                    left = getValidDimension((getLeftView() - left) * 0.5);
+
+                    el.style.top = top + "px";
+                    el.style.left = left + "px";
+
+                    top += getIntegerAttr(el, "offsetHeight") + dist;
+                }
+
+                if ("clear" in config) {
+                    simplifyView();
+                }
+            }
+
+            /**
+             * Hides most of the view, so it becomes as clear as possible
+             */
+            function simplifyView() {
+                let _hideElement = function(name) {
+                    let _el = document.getElementById(name);
+                    _el.style.visibility = "hidden";
+                    if (_el.parentElement && _el.parentElement.style)
+                        _el.parentElement.style.visibility = 'hidden';
+                }
+
+                _hideElement("gameInfo");
+                _hideElement("loadConfigButton");
+                _hideElement("gameView");
+                hideLine('title');
+
+                document.body.style.backgroundImage = "none";
+                document.body.style.backgroundColor = "#000000";
+            }
+
+            /**
+             * Configures the screen.
+             *
+             * @param{config} A 'config' object. Look at docs/config.md for more info.
+             */
+            function setupScreen(config) {
+                try {
+                    /* Clean up previous context */
+                    if (_nespadCtx != null) {
+                        _nespadCtx.close();
+                        _nespadCtx = null;
+                    }
+
+                    /* Initialize every value (to avoid errors) */
+                    _setLabelLate = false;
+                    if (!("timer" in config)) {
+                        config.timer = {};
+                    }
+                    if (!("splits" in config.timer)) {
+                        config.timer.splits = {};
+                    }
+                    if (!("input" in config)) {
+                        config.input = {};
+                    }
+
+                    /* Setup event handler to center everything **after** the
+                     * splits are loaded */
+                    if ("server" in config.timer.splits) {
+                        let cb = function(e) {
+                            document.removeEventListener('finishSetup', cb)
+                            centerLeftView(config);
+                        }
+                        document.addEventListener('finishSetup', cb)
+                    }
+
+                    /* Initialize everything */
+                    configureDisplay(config.display);
+                    setTitle(config.title);
+                    if ("control" in config.timer)
+                        gamepad.setTimerEventButton(config.timer.control);
+                    else
+                        gamepad.setTimerEventButton(null);
+                    if ("keyControl" in config.timer)
+                        keyboard.setTimerEventKey(config.timer.keyControl);
+                    else
+                        keyboard.setTimerEventKey(null);
+                    {
+                        let timer = document.getElementById('timer');
+                        let div = timer.parentElement;
+                        let visible = 'visible';
+                        if ("hidden" in config.timer && config.timer.hidden)
+                            visible = 'hidden';
+                        timer.style.visibility = visible;
+                        div.style.visibility = visible;
+                    }
+                    configureInput(config.input);
+                    let _maxSplitW = getValidDimension(getLeftView() * 0.8);
+                    let _maxSplitH = getValidDimension(calculateNonSplitHeight(config) * 0.95);
+                    setupSplits(config.timer.splits, _maxSplitW, _maxSplitH);
+                    if (!("server" in config.timer.splits)) {
+                        centerLeftView(config);
+                    }
+                } catch (e) {
+                    alert(e);
+                    /* Throwing makes the exception appear on the console */
+                    throw e;
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <label id="gameInfo" class="fixedRoot m5x7 gameInfo darkBg">&nbsp game div info here &nbsp</label>
+
+        <button id="loadConfigButton" class='fixedRoot img configButton' type="button" style="top: 608px; left: 0px;" onclick="setupLoadFile()"> </button>
+        <input id="configInput" type="file" name="name" style="display: none;" />
+
+        <div class='fixedRoot' id='gamepad-view'>
+            <img class='fixedChild' style='width: 220px; left: 0px; top: 0px;' src='/img/skin/small_border.png' />
+        </div>
+
+        <div class='fixedRoot' id='nespad-view'>
+            <img class='fixedChild' style='width: 220px; left: 0px; top: 0px;' src='/img/skin/small_border.png' />
+
+            <img class='fixedChild' style='width: 196px; left: 14px; top: 10px;' src='/img/gamepad/nes/released_buttons.png' />
+
+            <img id='nespad_left' class='fixedChild' style='width: 30px; height: 28px; left: 18px; top: 74px; visibility: hidden;' src='/img/gamepad/nes/pressed/left.png'/>
+            <img id='nespad_up' class='fixedChild' style='width: 28px; height: 30px; left: 42px; top: 50px; visibility: hidden;' src='/img/gamepad/nes/pressed/up.png'/>
+            <img id='nespad_down' class='fixedChild' style='width: 28px; height: 30px; left: 42px; top: 96px; visibility: hidden;' src='/img/gamepad/nes/pressed/down.png'/>
+            <img id='nespad_right' class='fixedChild' style='width: 30px; height: 28px; left: 64px; top: 74px; visibility: hidden;' src='/img/gamepad/nes/pressed/right.png'/>
+            <img id='nespad_select' class='fixedChild' style='width: 30px; height: 8px; left: 104px; top: 52px; visibility: hidden;' src='/img/gamepad/nes/pressed/select-start.png'/>
+            <img id='nespad_start' class='fixedChild' style='width: 30px; height: 8px; left: 146px; top: 52px; visibility: hidden;' src='/img/gamepad/nes/pressed/select-start.png'/>
+            <img id='nespad_b' class='fixedChild' style='width: 34px; height: 34px; left: 122px; top: 92px; visibility: hidden;' src='/img/gamepad/nes/pressed/b.png'/>
+            <img id='nespad_a' class='fixedChild' style='width: 34px; height: 34px; left: 166px; top: 92px; visibility: hidden;' src='/img/gamepad/nes/pressed/a.png'/>
+        </div>
+    </body>
+</html>
