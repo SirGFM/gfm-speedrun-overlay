@@ -946,6 +946,194 @@ let gamepad = function() {
             },
         }
     };
+    let _ps5Skin_win = {
+        'released': {
+            'src': '/img/gamepad/ps1/released.png',
+            'width': 190,
+            'left': 18,
+            'top': 18
+        },
+        'button': {
+            'l1': {
+                'src': '/img/gamepad/ps1/pressed/l1.png',
+                'width': 34,
+                'height': 16,
+                'left': 68,
+                'top': 38,
+                'button': 4
+            },
+            'r1': {
+                'src': '/img/gamepad/ps1/pressed/r1.png',
+                'width': 34,
+                'height': 16,
+                'left': 124,
+                'top': 38,
+                'button': 5
+            },
+            'l2': {
+                'src': '/img/gamepad/ps1/pressed/l2.png',
+                'width': 36,
+                'height': 20,
+                'left': 32,
+                'top': 18,
+                'button': 6
+            },
+            'r2': {
+                'src': '/img/gamepad/ps1/pressed/r2.png',
+                'width': 36,
+                'height': 20,
+                'left': 156,
+                'top': 18,
+                'button': 7
+            },
+            'select': {
+                'src': '/img/gamepad/ps1/pressed/select.png',
+                'width': 24,
+                'height': 12,
+                'left': 84,
+                'top': 68,
+                'button': 8
+            },
+            'start': {
+                'src': '/img/gamepad/ps1/pressed/start.png',
+                'width': 24,
+                'height': 12,
+                'left': 114,
+                'top': 68,
+                'button': 9
+            },
+            'square': {
+                'src': '/img/gamepad/ps1/pressed/square.png',
+                'width': 28,
+                'height': 28,
+                'left': 140,
+                'top': 72,
+                'button': 0
+            },
+            'triangle': {
+                'src': '/img/gamepad/ps1/pressed/triangle.png',
+                'width': 28,
+                'height': 28,
+                'left': 160,
+                'top': 52,
+                'button': 3
+            },
+            'cross': {
+                'src': '/img/gamepad/ps1/pressed/cross.png',
+                'width': 28,
+                'height': 28,
+                'left': 160,
+                'top': 92,
+                'button': 1
+            },
+            'circle': {
+                'src': '/img/gamepad/ps1/pressed/circle.png',
+                'width': 28,
+                'height': 28,
+                'left': 180,
+                'top': 72,
+                'button': 2
+            },
+            'up': {
+                'src': '/img/gamepad/ps1/pressed/up.png',
+                'width': 24,
+                'height': 26,
+                'left': 38,
+                'top': 52,
+                'button': 12
+            },
+            'down': {
+                'src': '/img/gamepad/ps1/pressed/down.png',
+                'width': 24,
+                'height': 26,
+                'left': 38,
+                'top': 90,
+                'button': 13
+            },
+            'left': {
+                'src': '/img/gamepad/ps1/pressed/left.png',
+                'width': 26,
+                'height': 24,
+                'left': 18,
+                'top': 72,
+                'button': 14
+            },
+            'right': {
+                'src': '/img/gamepad/ps1/pressed/right.png',
+                'width': 26,
+                'height': 24,
+                'left': 56,
+                'top': 72,
+                'button': 15
+            }
+        },
+        'axis': {
+            'lstick': {
+                'src': '/img/gamepad/ps1/stick.png',
+                'width': 18,
+                'height': 18,
+                'left': 80,
+                'top': 112,
+                'hw': 17,
+                'hh': 17,
+                'hor': 0,
+                'ver': 1
+            },
+            'rstick': {
+                'src': '/img/gamepad/ps1/stick.png',
+                'width': 18,
+                'height': 18,
+                'left': 126,
+                'top': 112,
+                'hw': 17,
+                'hh': 17,
+                'hor': 2,
+                'ver': 5
+            }
+        },
+        'hat': {
+            'up': {
+                'src': '/img/gamepad/ps1/pressed/up.png',
+                'width': 24,
+                'height': 26,
+                'left': 38,
+                'top': 52,
+                'button': 12,
+                'idx': 9,
+                'approx': [-1, 1, -0.714]
+            },
+            'down': {
+                'src': '/img/gamepad/ps1/pressed/down.png',
+                'width': 24,
+                'height': 26,
+                'left': 38,
+                'top': 90,
+                'button': 13,
+                'idx': 9,
+                'approx': [0.14, 0.42, -0.14]
+            },
+            'left': {
+                'src': '/img/gamepad/ps1/pressed/left.png',
+                'width': 26,
+                'height': 24,
+                'left': 18,
+                'top': 72,
+                'button': 14,
+                'idx': 9,
+                'approx': [0.714, 1, 0.42]
+            },
+            'right': {
+                'src': '/img/gamepad/ps1/pressed/right.png',
+                'width': 26,
+                'height': 24,
+                'left': 56,
+                'top': 72,
+                'button': 15,
+                'idx': 9,
+                'approx': [-0.42, -0.714, -0.14]
+            }
+        }
+    };
 
     /** Reset every image, so a new skin may be loaded. */
     let resetGamepad = function() {
@@ -981,8 +1169,12 @@ let gamepad = function() {
                     skin = 'ps1';
                 else if (gamepadId.indexOf(gcn_id) != -1)
                     skin = 'gcn';
-                else if (gamepadId.indexOf(ps5_id) != -1)
-                    skin = 'ps5';
+                else if (gamepadId.indexOf(ps5_id) != -1) {
+                    if (navigator.userAgent.indexOf('Windows') != -1)
+                        skin = 'ps5-win';
+                    else
+                        skin = 'ps5';
+                }
             }
             let parentContent = document.getElementById('gamepad-view');
             gamepad.setup(parentContent, skin);
@@ -1221,6 +1413,9 @@ _check_gp:
                 break;
             case 'ps5':
                 _obj = _ps5Skin;
+                break;
+            case 'ps5-win':
+                _obj = _ps5Skin_win;
                 break;
             case true:
                 return;
