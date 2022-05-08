@@ -1,0 +1,17 @@
+.pixelated {
+	/** Basic nearest-neighbour behaviour.
+	 * Source: http://stackoverflow.com/questions/14068103/disable-antialising-when-scaling-images */
+	image-rendering: optimizeSpeed;				/* STOP SMOOTHING, GIVE ME SPEED  */
+	image-rendering: -moz-crisp-edges;			/* Firefox */
+	image-rendering: -o-crisp-edges;			/* Opera */
+	image-rendering: -webkit-optimize-contrast;	/* Chrome (and eventually Safari) */
+	image-rendering: pixelated;					/* Chrome */
+	image-rendering: optimize-contrast;			/* CSS3 Proposed */
+	-ms-interpolation-mode: nearest-neighbor;	/* IE8+ */
+}
+
+img {
+	/* Fixed position (unchanged by viewport size), but contained
+	 * and relative to its closest parent. */
+	position: absolute;
+}

@@ -1,0 +1,461 @@
+<html>
+	<head>
+		<link rel='stylesheet' href='/res/style/style.css'>
+
+        <script type="text/javascript" src="/res/script/keyboard-viewer.js"></script>
+		<script>
+			/** Dictionary with every key, alongside their position and file. */
+			let keys = {
+				'Backspace': {
+					'x': 57,
+					'y': 10,
+					'file': 'key-backspace-numpad0-7x3.png',
+				},
+				'Tab': {
+					'x': 5,
+					'y': 14,
+					'file': 'key-tab-5x3.png',
+				},
+				'Return': {
+					'x': 59,
+					'y': 14,
+					'file': 'key-return.png',
+				},
+				'Esc': {
+					'x': 5,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'Space': {
+					'x': 20,
+					'y': 26,
+					'file': 'key-spacebar-24x3.png',
+				},
+				'PageUp': {
+					'x': 74,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'PageDown': {
+					'x': 74,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'End': {
+					'x': 70,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'Home': {
+					'x': 70,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Left': {
+					'x': 66,
+					'y': 26,
+					'file': 'key-3x3.png',
+				},
+				'Up': {
+					'x': 70,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'Right': {
+					'x': 74,
+					'y': 26,
+					'file': 'key-3x3.png',
+				},
+				'Down': {
+					'x': 70,
+					'y': 26,
+					'file': 'key-3x3.png',
+				},
+				'Insert': {
+					'x': 66,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Delete': {
+					'x': 66,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'Key0': {
+					'x': 45,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key1': {
+					'x': 9,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key2': {
+					'x': 13,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key3': {
+					'x': 17,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key4': {
+					'x': 21,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key5': {
+					'x': 25,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key6': {
+					'x': 29,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key7': {
+					'x': 33,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key8': {
+					'x': 37,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Key9': {
+					'x': 41,
+					'y': 10,
+					'file': 'key-3x3.png',
+				},
+				'Q': {
+					'x': 11,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'W': {
+					'x': 15,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'E': {
+					'x': 19,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'R': {
+					'x': 23,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'T': {
+					'x': 27,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'Y': {
+					'x': 31,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'U': {
+					'x': 35,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'I': {
+					'x': 39,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'O': {
+					'x': 43,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'P': {
+					'x': 47,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'A': {
+					'x': 12,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'S': {
+					'x': 16,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'D': {
+					'x': 20,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'F': {
+					'x': 24,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'G': {
+					'x': 28,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'H': {
+					'x': 32,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'J': {
+					'x': 36,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'K': {
+					'x': 40,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'L': {
+					'x': 44,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'Z': {
+					'x': 14,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'X': {
+					'x': 18,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'C': {
+					'x': 22,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'V': {
+					'x': 26,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'B': {
+					'x': 30,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'N': {
+					'x': 34,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'M': {
+					'x': 38,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'Numpad0': {
+					'x': 79,
+					'y': 26,
+					'file': 'key-backspace-numpad0-7x3.png',
+				},
+				'Numpad1': {
+					'x': 79,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'Numpad2': {
+					'x': 83,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'Numpad3': {
+					'x': 87,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'Numpad4': {
+					'x': 79,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'Numpad5': {
+					'x': 83,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'Numpad6': {
+					'x': 87,
+					'y': 18,
+					'file': 'key-3x3.png',
+				},
+				'Numpad7': {
+					'x': 79,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'Numpad8': {
+					'x': 83,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'Numpad9': {
+					'x': 87,
+					'y': 14,
+					'file': 'key-3x3.png',
+				},
+				'F1': {
+					'x': 13,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F2': {
+					'x': 17,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F3': {
+					'x': 21,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F4': {
+					'x': 25,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F5': {
+					'x': 31,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F6': {
+					'x': 35,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F7': {
+					'x': 39,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F8': {
+					'x': 43,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F9': {
+					'x': 49,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F10': {
+					'x': 53,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F11': {
+					'x': 57,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'F12': {
+					'x': 61,
+					'y': 5,
+					'file': 'key-3x3.png',
+				},
+				'LShift': {
+					'x': 5,
+					'y': 22,
+					'file': 'key-4x3.png',
+				},
+				'RShift': {
+					'x': 58,
+					'y': 22,
+					'file': 'key-rshift-capslock-6x3.png',
+				},
+				'LCtrl': {
+					'x': 5,
+					'y': 26,
+					'file': 'key-4x3.png',
+				},
+				'RCtrl': {
+					'x': 60,
+					'y': 26,
+					'file': 'key-4x3.png',
+				},
+				'LAlt': {
+					'x': 15,
+					'y': 26,
+					'file': 'key-4x3.png',
+				},
+				'RAlt': {
+					'x': 45,
+					'y': 26,
+					'file': 'key-4x3.png',
+				},
+				'Comma': {
+					'x': 42,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+				'Period': {
+					'x': 46,
+					'y': 22,
+					'file': 'key-3x3.png',
+				},
+			};
+
+			/**
+			 * Create a new image at the given position and within the
+			 * given container.
+			 *
+			 * Note that the position is relative to the element's parent.
+			 *
+			 * @param{x} The horizontal position of the element.
+			 * @param{y} The vertical position of the element.
+			 * @param{file} The file, within /res/img, for this image.
+			 * @param{bg} The image's parent.
+			 * @return The DOM <img> created.
+			 */
+			let create_img_at = function(x, y, file, bg) {
+				let img = document.createElement('img');
+
+				img.className = 'pixelated';
+				img.src = '/res/img/' + file;
+				img.style.left = x + 'px';
+				img.style.top = y + 'px';
+				img.style.visibility = 'hidden';
+				bg.appendChild(img);
+
+				return img;
+			}
+
+			/**
+			 * Bootstrap, after the page is loaded.
+			 */
+			document.addEventListener('DOMContentLoaded', function (event) {
+				let bg = document.getElementById('keyholder');
+
+				for (idx in keys) {
+					let img = keys[idx];
+
+					keys[idx].img = create_img_at(img.x, img.y, img.file, bg);
+				}
+				keyboard_viewer.start_watching('/ram_store/keyboard', 10, keys);
+			});
+		</script>
+	</head>
+	<body>
+		<div id='keyholder'>
+			<img class='pixelated' src='/res/img/def-keyboard.png' style='left: 0; top: 0;'/>
+		</div>
+	</body>
+</html>
