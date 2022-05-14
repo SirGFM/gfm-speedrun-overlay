@@ -44,6 +44,9 @@ func main() {
 
             if err != nil {
                 log.Printf("Error: %+v\n", err)
+                if merr, ok := err.(monitor.ErrorCode); ok && merr == monitor.ErrNoGamepad {
+                    hasGamepad = false
+                }
             } else {
                 log.Printf("Gamepad: %+v\n", gp)
             }

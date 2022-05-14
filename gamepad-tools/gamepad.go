@@ -121,6 +121,7 @@ func (gp *Gamepad)Update(m *monitor.Monitor, data []byte) ([]byte, error) {
     data, err := m.GetGamepadData(gp.idx, data)
     if err == nil {
         gp.parse(data)
+        err = gp.checkEmpty()
     }
     return data, err
 }
