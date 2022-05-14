@@ -70,8 +70,11 @@ const (
     ErrGetJoystickID
     // Failed to expand the list of nodes
     ErrAddJoystickEvent3
+)
+
+const (
     // The Monitor interface was closed and shouldn't be used anymore
-    ErrFinished
+    ErrFinished ErrorCode = iota + 1000
     // Failed to call function in Windows' DLL
     ErrWinSyscall
     // Failed to retrieve the payload length
