@@ -54,7 +54,7 @@ const (
     ErrUnlock
     // Failed to synchronize the library's mainloop
     ErrWaitLock
-    // Failed to expand the list of nodes
+    // DEPRECATED: Failed to expand the list of nodes
     ErrAddJoystickEvent1
     // Failed to add a new joystick
     ErrAddJoystickEvent2
@@ -66,6 +66,10 @@ const (
     ErrAllocJoyNode
     // Failed to unlock the library's mainloop synchronization
     ErrWaitUnlock
+    // Failed to retrieve the joystick index
+    ErrGetJoystickID
+    // Failed to expand the list of nodes
+    ErrAddJoystickEvent3
     // The Monitor interface was closed and shouldn't be used anymore
     ErrFinished
     // Failed to call function in Windows' DLL
@@ -121,7 +125,7 @@ func (e ErrorCode) Error() string {
         case ErrWaitLock:
             return "Failed to synchronize the library's mainloop"
         case ErrAddJoystickEvent1:
-            return "Failed to expand the list of nodes"
+            return "DEPRECATED: Failed to expand the list of nodes"
         case ErrAddJoystickEvent2:
             return "Failed to add a new joystick"
         case ErrExpandList:
@@ -140,6 +144,10 @@ func (e ErrorCode) Error() string {
             return "Failed to retrieve the payload length"
         case ErrNoGamepad:
             return "No gamepad has been detected yet"
+        case ErrGetJoystickID:
+            return "Failed to retrieve the joystick index"
+        case ErrAddJoystickEvent3:
+            return "Failed to expand the list of nodes"
         default:
             return "Unknown error"
     }

@@ -58,12 +58,14 @@ enum error {
     ERR_LOCK,
     ERR_UNLOCK,
     ERR_WAIT_LOCK,
-    ERR_ERR_ADD_JOYSTICK_EVENT_1,
+    ERR_ERR_ADD_JOYSTICK_EVENT_1, /* DEPRECATED */
     ERR_ERR_ADD_JOYSTICK_EVENT_2,
     ERR_EXPAND_LIST,
     ERR_OPEN_JOYSTICK,
     ERR_ALLOC_JOY_NODE,
     ERR_WAIT_UNLOCK,
+    ERR_GET_JOYSTICK_ID,
+    ERR_ADD_JOYSTICK_EVENT_3,
 };
 
 /** Tracks "balls", a 2D trackpad?. */
@@ -333,27 +335,41 @@ static void* _get_ptr_and_move(uintptr_t *src, size_t field_size) {
  * Configure a new joystick representing a SDL2 Joystick. This should be
  * called in response to a SDL_JOYDEVICEADDED event.
  *
- * @param[out] new_node: Address of the newly configured joystick.
- * @param[in]  idx:      Index a SDL2 Joystick.
+ * @param[in]  idx: Index of the new SDL2 joystick.
  *
  * @return An `enum error` indicating the result of the operation.
  */
-static int new_joy_node(struct joystick **new_node, int idx) {
+static int new_joy_node(int idx) {
     struct joystick *node;
     SDL_Joystick *sdlj;
     struct joystick_fields_num num_fields;
+    SDL_JoystickID jid;
     size_t size;
     uintptr_t ptr;
     int rv = 0;
 
+    /* SDL_JOYDEVICEADDED indicates the index of the connected joystick.
+     * However, further events use the joystick instance ID to identify the
+     * joystick that generated the event.
+     *
+     * Therefore, not only the joystick ID must be used to index the data
+     * in the list of joysticks, but last_id must also be updated
+     * accordingly. */
     sdlj = SDL_JoystickOpen(idx);
     ASSERT_RV_GOTO(sdlj != 0, ERR_OPEN_JOYSTICK, open_joystick);
+
+    jid = SDL_JoystickInstanceID(sdlj);
+    ASSERT_RV_GOTO(jid >= 0, ERR_GET_JOYSTICK_ID, close_joystick);
+    rv = expand_list(jid);
+    ASSERT_RV_GOTO(rv == ERR_OK, ERR_ADD_JOYSTICK_EVENT_3, close_joystick);
+
+    last_id = jid;
 
     num_fields = get_num_joy_fields(sdlj);
     size = get_joystick_data_size(num_fields);
 
     node = malloc(size);
-    ASSERT_RV_GOTO(node != 0, ERR_ALLOC_JOY_NODE, alloc_node);
+    ASSERT_RV_GOTO(node != 0, ERR_ALLOC_JOY_NODE, close_joystick);
     memset(node, 0x0, size);
 
     node->sdlj = sdlj;
@@ -381,10 +397,11 @@ static int new_joy_node(struct joystick **new_node, int idx) {
     if (size > biggest_node)
         biggest_node = size;
 
-    *new_node = node;
+    joy_list[jid] = node;
+    LOG("Added joystick %d\n", jid);
     return ERR_OK;
 
-alloc_node:
+close_joystick:
     SDL_JoystickClose(sdlj);
 open_joystick:
     return rv;
@@ -481,13 +498,12 @@ static void set_hat(SDL_JoyHatEvent *hat) {
 static enum error handle_event(SDL_Event *ev) {
     switch (ev->type) {
     case SDL_JOYDEVICEADDED:
-        ASSERT_RET(expand_list(ev->jdevice.which) == ERR_OK, ERR_ERR_ADD_JOYSTICK_EVENT_1);
-        ASSERT_RET(new_joy_node(joy_list + ev->jdevice.which, ev->jdevice.which) == ERR_OK, ERR_ERR_ADD_JOYSTICK_EVENT_2);
-        LOG("Added new joystick!\n");
+        ASSERT_RET(new_joy_node(ev->jdevice.which) == ERR_OK, ERR_ERR_ADD_JOYSTICK_EVENT_2);
+        LOG("Added new joystick (%d)!\n", ev->jdevice.which);
         break;
     case SDL_JOYDEVICEREMOVED:
         rem_joy_node(ev->jdevice.which);
-        LOG("Removed joystick!\n");
+        LOG("Removed joystick (%d)!\n", ev->jdevice.which);
         break;
     case SDL_JOYAXISMOTION:
         set_axis(&ev->jaxis);
