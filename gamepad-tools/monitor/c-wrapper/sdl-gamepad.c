@@ -220,6 +220,35 @@ static struct joystick_fields_num get_num_joy_fields(SDL_Joystick *sdlj) {
 }
 
 /**
+ * Expand the list of tracked devices so the requested index may be
+ * accessed.
+ *
+ * @param[in] idx: Index of the joystick.
+ *
+ * @return An `enum error` indicating the result of the operation.
+ */
+static enum error expand_list(int idx) {
+    struct joystick **new_joy_list;
+    int new_joy_count = 0;
+
+    if (joy_count > idx)
+        return ERR_OK;
+
+    new_joy_count = (idx + 1) * 2;
+    new_joy_list = malloc(sizeof(struct joystick*) * new_joy_count);
+    ASSERT_RET(new_joy_list, ERR_EXPAND_LIST);
+
+    memset(new_joy_list, 0x0, sizeof(struct joystick*) * new_joy_count);
+    memcpy(new_joy_list, joy_list, sizeof(struct joystick*) * joy_count);
+
+    free(joy_list);
+    joy_list = new_joy_list;
+    joy_count = new_joy_count;
+
+    return ERR_OK;
+}
+
+/**
  * Retrieve the number of each field in `node`, a `struct joystick`. `node`
  * may be NULL, in which case 0 will be returned for each field.
  *
@@ -385,35 +414,6 @@ static void rem_joy_node(int idx) {
         return;
     free(get_node(idx));
     joy_list[idx] = 0;
-}
-
-/**
- * Expand the list of tracked devices so the requested index may be
- * accessed.
- *
- * @param[in] idx: Index of the joystick.
- *
- * @return An `enum error` indicating the result of the operation.
- */
-static enum error expand_list(int idx) {
-    struct joystick **new_joy_list;
-    int new_joy_count = 0;
-
-    if (joy_count > idx)
-        return ERR_OK;
-
-    new_joy_count = (idx + 1) * 2;
-    new_joy_list = malloc(sizeof(struct joystick*) * new_joy_count);
-    ASSERT_RET(new_joy_list, ERR_EXPAND_LIST);
-
-    memset(new_joy_list, 0x0, sizeof(struct joystick*) * new_joy_count);
-    memcpy(new_joy_list, joy_list, sizeof(struct joystick*) * joy_count);
-
-    free(joy_list);
-    joy_list = new_joy_list;
-    joy_count = new_joy_count;
-
-    return ERR_OK;
 }
 
 /**
