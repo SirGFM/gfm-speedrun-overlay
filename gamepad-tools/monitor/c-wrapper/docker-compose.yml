@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  linux:
+    image: gfm-dev-env
+    build: ./build-docker
+    volumes:
+     - .:/monitor-c-wrapper
+    working_dir: /monitor-c-wrapper
+    command: make libsdl-gamepad.so
+  win64:
+    image: gfm-dev-env
+    build: ./build-docker
+    volumes:
+     - .:/monitor-c-wrapper
+    working_dir: /monitor-c-wrapper
+    environment:
+     - CC=x86_64-w64-mingw32-gcc
+    command: make sdl-gamepad.dll
