@@ -44,12 +44,14 @@ type Gamepad struct {
     Hats []uint8
     // Joystick's name.
     Name string
+    // Device's GUID
+    Guid []uint8
 }
 
 // Check whether the given gamepad has any field set.
 func (gp *Gamepad)checkEmpty() error {
     if len(gp.Balls) == 0 && len(gp.Axes) == 0 && len(gp.Buttons) == 0 &&
-            len(gp.Hats) == 0 && len(gp.Name) == 0 {
+            len(gp.Hats) == 0 && len(gp.Name) == 0 && len(gp.Guid) == 0 {
         return monitor.ErrNoGamepad
     }
     return nil
@@ -64,8 +66,9 @@ func (gp *Gamepad)parse(data []byte) {
 
     dec := hostOrder()
     nameLen := dec.Uint32(data[4:8])
+    guidLen := dec.Uint32(data[8:12])
 
-    data = data[8:]
+    data = data[12:]
 
     gp.Balls = gp.Balls[:0]
     for ; numBalls > 0; numBalls-- {
@@ -98,9 +101,15 @@ func (gp *Gamepad)parse(data []byte) {
     }
 
     if nameLen > 0 {
-        gp.Name = string(data)
+        gp.Name = string(data[:nameLen])
+        data = data[nameLen:]
     } else {
         gp.Name = ""
+    }
+
+    gp.Guid = gp.Guid[:0]
+    if guidLen > 0 {
+        gp.Guid = append(gp.Guid, data[:guidLen]...)
     }
 }
 

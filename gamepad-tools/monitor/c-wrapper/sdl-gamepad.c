@@ -90,6 +90,8 @@ struct joystick {
     uint8_t *num_hats;
     /** Points to the length of the SDL2 Joystick's name. */
     uint32_t *name_len;
+    /** Points to the length of the SDL2 Joystick's GUID. */
+    uint32_t *guid_len;
     /** Points to the list of balls. */
     struct joystick_ball *balls;
     /** Points to the list of axes. */
@@ -100,6 +102,8 @@ struct joystick {
     Uint8 *hats;
     /** Points to the joystick name. */
     char *name;
+    /** Points to the device's GUID. */
+    Uint8 *guid;
 };
 
 /** Track the number of fields in `struct joystick`. */
@@ -114,6 +118,8 @@ struct joystick_fields_num {
     size_t hats;
     /** The lenght of the name, with the trailing '\0'. */
     size_t name_len;
+    /** The lenght of the device's GUID. */
+    size_t guid_len;
 };
 
 /** =========================================================================
@@ -217,6 +223,7 @@ static struct joystick_fields_num get_num_joy_fields(SDL_Joystick *sdlj) {
     if (num_fields.hats < 0)
         num_fields.hats = 0;
     num_fields.name_len = strlen(get_sdljoy_name(sdlj)) + 1;
+    num_fields.guid_len = sizeof(SDL_JoystickGUID);
 
     return num_fields;
 }
@@ -267,6 +274,7 @@ static struct joystick_fields_num node_to_joy_fields(struct joystick *node) {
         num_fields.buttons = *node->num_buttons;
         num_fields.hats = *node->num_hats;
         num_fields.name_len = *node->name_len;
+        num_fields.guid_len = *node->guid_len;
     }
     else {
         memset(&num_fields, 0x0, sizeof(num_fields));
@@ -298,6 +306,7 @@ static size_t get_joystick_data_size(struct joystick_fields_num num_fields) {
     size += sizeof(uint8_t) + num_fields.buttons * sizeof(uint8_t);
     size += sizeof(uint8_t) + num_fields.hats * sizeof(uint8_t);
     size += sizeof(uint32_t) + num_fields.name_len;
+    size += sizeof(uint32_t) + num_fields.guid_len;
 
     return size;
 }
@@ -344,6 +353,7 @@ static int new_joy_node(int idx) {
     SDL_Joystick *sdlj;
     struct joystick_fields_num num_fields;
     SDL_JoystickID jid;
+    SDL_JoystickGUID guid;
     size_t size;
     uintptr_t ptr;
     int rv = 0;
@@ -380,18 +390,24 @@ static int new_joy_node(int idx) {
     node->num_buttons = get_ptr_and_move(&ptr, uint8_t, 1);
     node->num_hats = get_ptr_and_move(&ptr, uint8_t, 1);
     node->name_len = get_ptr_and_move(&ptr, uint32_t, 1);
+    node->guid_len = get_ptr_and_move(&ptr, uint32_t, 1);
     node->balls = get_ptr_and_move(&ptr, struct joystick_ball, num_fields.balls);
     node->axes = get_ptr_and_move(&ptr, uint16_t, num_fields.axes);
     node->buttons = get_ptr_and_move(&ptr, uint8_t, num_fields.buttons);
     node->hats = get_ptr_and_move(&ptr, uint8_t, num_fields.hats);
     node->name = get_ptr_and_move(&ptr, char, num_fields.name_len);
+    node->guid = get_ptr_and_move(&ptr, char, num_fields.guid_len);
 
     *node->num_balls = num_fields.balls;
     *node->num_axes = num_fields.axes;
     *node->num_buttons = num_fields.buttons;
     *node->num_hats = num_fields.hats;
     *node->name_len = num_fields.name_len;
+    *node->guid_len = num_fields.guid_len;
+
     memcpy(node->name, get_sdljoy_name(sdlj), num_fields.name_len);
+    guid = SDL_JoystickGetGUID(sdlj);
+    memcpy(node->guid, &guid, num_fields.guid_len);
 
     size -= get_aligned8_joystick_size();
     if (size > biggest_node)
@@ -640,11 +656,13 @@ no_sdl:
  *        uint8_t num_buttons;
  *        uint8_t num_hats;
  *        uint32_t name_len;
+ *        uint32_t guid_len;
  *        struct ball balls[];
  *        int16_t axes[];
  *        uint8_t buttons[];
  *        uint8_t hats[];
  *        char *name;
+ *        uint8_t guid[];
  *    }
  *
  *     The number of each field (`num_*`) is required, but the arrays are only
