@@ -27,7 +27,7 @@ import (
 // Tracks "ball axes" (a 2D trackpad, maybe?). See
 // http://wiki.libsdl.org/SDL_JoystickGetBall?highlight=%28%5CbCategoryJoystick%5Cb%29%7C%28CategoryEnum%29%7C%28CategoryStruct%29
 type GamepadBall struct {
-    x, y int32
+    X, Y int32
 }
 
 // A gamepad representation.
@@ -73,8 +73,8 @@ func (gp *Gamepad)parse(data []byte) {
     gp.Balls = gp.Balls[:0]
     for ; numBalls > 0; numBalls-- {
         gpb := GamepadBall{}
-        gpb.x = int32(dec.Uint32(data[:4]))
-        gpb.y = int32(dec.Uint32(data[4:8]))
+        gpb.X = int32(dec.Uint32(data[:4]))
+        gpb.Y = int32(dec.Uint32(data[4:8]))
         data = data[8:]
 
         gp.Balls = append(gp.Balls, gpb)
