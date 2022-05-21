@@ -8,6 +8,7 @@ import (
 	"fmt"
 	key_logger "github.com/SirGFM/goLogKeys/logger"
 	gptools "github.com/SirGFM/gfm-speedrun-overlay/gamepad-tools"
+	gpevents "github.com/SirGFM/gfm-speedrun-overlay/local/gamepad-events"
 	"github.com/SirGFM/gfm-speedrun-overlay/gamepad-tools/monitor"
 	"github.com/SirGFM/gfm-speedrun-overlay/local/key-events"
 	"io"
@@ -49,95 +50,17 @@ func (it inputType) String() string {
 }
 
 // input describe every input type in a gamepad handled by the application.
-type input uint32
-const (
-	AButton input = iota
-	BButton
-	XButton
-	YButton
-	RbButton
-	RtButton
-	LbButton
-	LtButton
-	StartButton
-	SelectButton
-	DPadLeftButton
-	DPadRightButton
-	DPadUpButton
-	DPadDownButton
-	LeftStickHorizontalLeft
-	LeftStickHorizontalRight
-	LeftStickVerticalUp
-	LeftStickVerticalDown
-	RightStickHorizontalLeft
-	RightStickHorizontalRight
-	RightStickVerticalUp
-	RightStickVerticalDown
-	NumInputs
-)
-
-// Name returns a human-readable name for the input.
-func (i input) Name() string {
-	switch i {
-	case AButton: return "'A' button"
-	case BButton: return "'B' button"
-	case XButton: return "'X' button"
-	case YButton: return "'Y' button"
-	case RbButton: return "'RB' button"
-	case RtButton: return "'RT' button"
-	case LbButton: return "'LB' button"
-	case LtButton: return "'LT' button"
-	case StartButton: return "'Start' button"
-	case SelectButton: return "'Select' button"
-	case DPadLeftButton: return "D-pad Left"
-	case DPadRightButton: return "D-pad Right"
-	case DPadUpButton: return "D-pad Up"
-	case DPadDownButton: return "D-pad Down"
-	case LeftStickHorizontalLeft: return "Left Stick Horizontally to the Left"
-	case LeftStickHorizontalRight: return "Left Stick Horizontally to the Right"
-	case LeftStickVerticalUp: return "Left Stick Horizontally Upward"
-	case LeftStickVerticalDown: return "Left Stick Horizontally Downward"
-	case RightStickHorizontalLeft: return "Right Stick Horizontally to the Left"
-	case RightStickHorizontalRight: return "Right Stick Horizontally to the Right"
-	case RightStickVerticalUp: return "Right Stick Horizontally Upward"
-	case RightStickVerticalDown: return "Right Stick Horizontally Downward"
-	default:
-		fatalf("Invalid input '%d'", i)
-		// Note: This return isn't reached!
-		return ""
-	}
+type input struct {
+	gpevents.InputName
 }
 
 // Name returns the name used to identify the input in a JSON object.
 func (i input) JsonKey() string {
-	switch i {
-	case AButton: return "a"
-	case BButton: return "b"
-	case XButton: return "x"
-	case YButton: return "y"
-	case RbButton: return "rb"
-	case RtButton: return "rt"
-	case LbButton: return "lb"
-	case LtButton: return "lt"
-	case StartButton: return "start"
-	case SelectButton: return "select"
-	case DPadLeftButton: return "left"
-	case DPadRightButton: return "right"
-	case DPadUpButton: return "up"
-	case DPadDownButton: return "down"
-	case LeftStickHorizontalLeft: return "lstick_left"
-	case LeftStickHorizontalRight: return "lstick_right"
-	case LeftStickVerticalUp: return "lstick_up"
-	case LeftStickVerticalDown: return "lstick_down"
-	case RightStickHorizontalLeft: return "rstick_left"
-	case RightStickHorizontalRight: return "rstick_right"
-	case RightStickVerticalUp: return "rstick_up"
-	case RightStickVerticalDown: return "rstick_down"
-	default:
-		fatalf("Invalid input '%d'", i)
-		// Note: This return isn't reached!
-		return ""
+	key, err := i.MarshalText()
+	if err != nil {
+		fatalf("Invalid input: %+v", err)
 	}
+	return string(key)
 }
 
 // Type returns the inputType for a given input. This simply changes the input
@@ -145,28 +68,28 @@ func (i input) JsonKey() string {
 // detected at all.
 func (i input) Type() inputType {
 	switch i {
-	case AButton,
-		BButton,
-		XButton,
-		YButton,
-		RbButton,
-		RtButton,
-		LbButton,
-		LtButton,
-		StartButton,
-		SelectButton,
-		DPadLeftButton,
-		DPadRightButton,
-		DPadUpButton,
-		DPadDownButton: return ButtonInput
-	case LeftStickHorizontalLeft,
-		LeftStickHorizontalRight,
-		LeftStickVerticalUp,
-		LeftStickVerticalDown,
-		RightStickHorizontalLeft,
-		RightStickHorizontalRight,
-		RightStickVerticalUp,
-		RightStickVerticalDown: return AxisInput
+	case input{gpevents.AButton},
+		input{gpevents.BButton},
+		input{gpevents.XButton},
+		input{gpevents.YButton},
+		input{gpevents.RbButton},
+		input{gpevents.RtButton},
+		input{gpevents.LbButton},
+		input{gpevents.LtButton},
+		input{gpevents.StartButton},
+		input{gpevents.SelectButton},
+		input{gpevents.DPadLeftButton},
+		input{gpevents.DPadRightButton},
+		input{gpevents.DPadUpButton},
+		input{gpevents.DPadDownButton}: return ButtonInput
+	case input{gpevents.LeftStickHorizontalLeft},
+		input{gpevents.LeftStickHorizontalRight},
+		input{gpevents.LeftStickVerticalUp},
+		input{gpevents.LeftStickVerticalDown},
+		input{gpevents.RightStickHorizontalLeft},
+		input{gpevents.RightStickHorizontalRight},
+		input{gpevents.RightStickVerticalUp},
+		input{gpevents.RightStickVerticalDown}: return AxisInput
 	default:
 		fatalf("Invalid input '%d'", i)
 		// Note: This return isn't reached!
@@ -445,17 +368,19 @@ Notes:
   - To skip any button, press enter without pressing anything on the gamepad`)
 
 	var buttonList []gamepadInput
-	for i := input(0); i < NumInputs; i++ {
-		fmt.Printf("%s on the gamepad then press Enter ...\n", i.GetPrompt())
+	for i := gpevents.InputName(0); i < gpevents.NumInputNames; i++ {
+		in := input{i}
+
+		fmt.Printf("%s on the gamepad then press Enter ...\n", in.GetPrompt())
 
 		a.Wait(default_check_per_second)
 		data, err = gp.Update(m, data)
 		if err != nil {
-			fatalf("Couldn't read the gamepad for %s: %+v", input.Name, err)
+			fatalf("Couldn't read the gamepad for %s: %+v", in.Name(), err)
 		}
 
 		button := gamepadInput {
-			Input: i,
+			Input: in,
 			Gamepad: cloneGamepad(&gp),
 		}
 		buttonList = append(buttonList, button)
