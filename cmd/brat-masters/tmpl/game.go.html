@@ -1,0 +1,321 @@
+<html class="res1080p">
+	<head>
+		<title> Brat Masters pre-race </title>
+		<meta charset="utf-8" name="viewport" content="width=1920, height=1080, initial-scale=1" />
+
+		<link rel="stylesheet" href="/res/style/common.css">
+		<script type="text/javascript" src="/res/script/auto_reload.js"></script>
+		<script type="text/javascript" src="/res/script/auto_resize.js"></script>
+		<script type="text/javascript" src="/res/script/auto_vcenter.js"></script>
+		<script type="text/javascript" src="/res/script/conn.js"></script>
+		<script type="text/javascript" src="/res/script/timer.js"></script>
+
+		<style>
+			/*
+			body {
+				background: url('/res/img/base/game-4x3.png');
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			*/
+
+			div.game {
+				/** / background-color: gray; /**/
+				width: 896px;
+				height: 70px;
+				max-height: 70px;
+			}
+
+			div.goal {
+				/** / background-color: gray; /**/
+				width: 756px;
+				height: 50px;
+				max-height: 50px;
+			}
+
+			div.team-name-small {
+				/** / background-color: gray; /**/
+				width: 442px;
+				height: 70px;
+				max-height: 70px;
+			}
+
+			div.name-small {
+				/** / background-color: gray; /**/
+				width: 312px;
+				height: 70px;
+				max-height: 70px;
+			}
+
+			div.timer-small {
+				/** / background-color: gray; /**/
+				width: 200px;
+				height: 75px;
+				max-height: 75px;
+				line-height: 75px;
+				text-align: center;
+			}
+
+			img.trophy {
+				width: 70px;
+				height: 63px;
+			}
+
+			span.timer-shadow {
+				color: #00000000;
+				text-shadow: -4px 0px 3px #000000,
+							 -2px 2px 3px #000000,
+							 2px 2px 3px #000000,
+							 2px -2px 3px #000000,
+							 -2px -2px 3px #000000;
+				z-index: -1;
+			}
+
+			span.timer {
+				font-size: 60px;
+				font-family: 'SerifGothicBQ';
+				padding: 0;
+				margin: 0;
+				width: 43px;
+				position: absolute;
+			}
+		</style>
+
+		<script>
+			/** How often the refresh function is called, in milliseconds. */
+			const refreshRateMs = 500;
+
+			/**
+			 * safe_run calls a function logging any exceptions.
+			 */
+			let safe_run = function (cb) {
+				try {
+					cb();
+				} catch (e) {
+					console.log(e);
+				}
+			}
+
+			/**
+			 * Register an update function, called every refreshRateMs,
+			 * after the page is done loading.
+			 */
+			document.addEventListener("DOMContentLoaded", function (event) {
+				{{if .LeftTimer}}
+					safe_run(function() { timer.update_by_value('div-left-timer', {{.LeftTimer}}); });
+				{{else}}
+					safe_run(function() { timer.update('div-left-timer'); });
+				{{end}}
+				{{if .RightTimer}}
+					safe_run(function() { timer.update_by_value('div-right-timer', {{.RightTimer}}); });
+				{{else}}
+					safe_run(function() { timer.update('div-right-timer'); });
+				{{end}}
+
+				window.setInterval(function() {
+					safe_run(auto_reload.update);
+					{{if (not .LeftTimer)}}
+						safe_run(function() { timer.update('div-left-timer'); });
+					{{end}}
+					{{if (not .RightTimer)}}
+						safe_run(function() { timer.update('div-right-timer'); });
+					{{end}}
+				}, refreshRateMs);
+			});
+		</script>
+	</head>
+
+	<body class='no-bg res1080p'>
+		<!-- Empty div used so others may compute their length more easily -->
+		<div id='empty' style='width: 0; height: 0;'> </div>
+
+		<!-- Main area where everything is placed at -->
+		<div id='view' style='width: 1920; height: 1080;'>
+
+			<div id='div-game'>
+				<div
+					id='div-game-title'
+					class='hcenter vcenter game'
+					style='left: 512px; top: 820px;'
+				>
+					<p id='game-title' class='resize'>
+						{{.Game}}
+					</p>
+				</div>
+			</div> <!-- id: div-game -->
+
+			<div id='div-goal'>
+				<div
+					id='div-goal-title'
+					class='hcenter vcenter goal'
+					style='left: 582px; top: 940px;'
+				>
+					<p id='goal' class='resize'>
+						{{.Goal}}
+					</p>
+				</div>
+			</div> <!-- id: div-goal -->
+
+			<!--
+			  - Container for the trophies.
+			  -
+			  - Since every trophy is on the same vertical position,
+			  - it's set only once on the 'wins' div.
+			  -->
+			<div id='wins' style='top: 779px'>
+				{{if (gt .LeftTeamWinCount 0.0)}}
+					<div id='div-left-trophy-1'>
+						<img id='left-trophy-1'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 227px';
+						>
+					</div>
+				{{end}}
+
+				{{if (gt .LeftTeamWinCount 1.0)}}
+					<div id='div-left-trophy-2'>
+						<img id='left-trophy-2'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 313px';
+						>
+					</div>
+				{{end}}
+
+				{{if (gt .RightTeamWinCount 1.0)}}
+					<div id='div-right-trophy-1'>
+						<img id='right-trophy-1'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 1537px';
+						>
+					</div>
+				{{end}}
+
+				{{if (gt .RightTeamWinCount 0.0)}}
+					<div id='div-right-trophy-2'>
+						<img id='right-trophy-2'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 1623px';
+						>
+					</div>
+				{{end}}
+			</div> <!-- id: wins -->
+
+			<!--
+			  - Container for the left team.
+			  -
+			  - Since every name is aligned,
+			  - the horizontal position is set only once
+			  - on the 'left-team' div.
+			  -->
+			<div id='left-team' style='left: 5px;'>
+				<div
+					id='div-left-timer'
+					class='hcenter timer-small'
+					style='top: 770px;'
+				>
+					<div style='top: 0px; left: 9px;'>
+						<span class='timer timer-shadow' id='shadow-min-hd'>0</span>
+						<span class='timer' id='min-hd'>0</span>
+					</div>
+					<div style='top: 0px; left: 49px;'>
+						<span class='timer timer-shadow' id='shadow-min-ld'>0</span>
+						<span class='timer' id='min-ld'>0</span>
+					</div>
+					<div style='top: 0px; left: 79px;'>
+						<span class='timer timer-shadow' id='shadow-s-colon'>:</span>
+						<span class='timer' id='s-colon'>:</span>
+					</div>
+					<div style='top: 0px; left: 109px;'>
+						<span class='timer timer-shadow' id='shadow-s-hd'>0</span>
+						<span class='timer' id='s-hd'>0</span>
+					</div>
+					<div style='top: 0px; left: 149px;'>
+						<span class='timer timer-shadow' id='shadow-s-ld'>0</span>
+						<span class='timer' id='s-ld'>0</span>
+					</div>
+				</div>
+
+				<div
+					id='div-left-racer'
+					class='hcenter vcenter name-small'
+					style='top: 850px; left: 76px;'
+				>
+					<p id='left-racer' class='resize'>
+						{{.LeftRacer}}
+					</p>
+				</div>
+
+				<div
+					id='div-left-team-name'
+					class='hcenter vcenter team-name-small'
+					style='top: 925px; left: 4px;'
+				>
+					<p id='left-team-name' class='resize'>
+						{{.LeftTeam}}
+					</p>
+				</div>
+			</div> <!-- id: left-team -->
+
+			<!--
+			  - Container for the right team.
+			  -
+			  - Since every name is aligned,
+			  - the horizontal position is set only once
+			  - on the 'right-team' div.
+			  -->
+			<div id='right-team' style='left: 1465px'>
+				<div
+					id='div-right-timer'
+					class='hcenter timer-small'
+					style='left: 250px; top: 770px;'
+				>
+					<div style='top: 0px; left: 9px;'>
+						<span class='timer timer-shadow' id='shadow-min-hd'>0</span>
+						<span class='timer' id='min-hd'>0</span>
+					</div>
+					<div style='top: 0px; left: 49px;'>
+						<span class='timer timer-shadow' id='shadow-min-ld'>0</span>
+						<span class='timer' id='min-ld'>0</span>
+					</div>
+					<div style='top: 0px; left: 79px;'>
+						<span class='timer timer-shadow' id='shadow-s-colon'>:</span>
+						<span class='timer' id='s-colon'>:</span>
+					</div>
+					<div style='top: 0px; left: 109px;'>
+						<span class='timer timer-shadow' id='shadow-s-hd'>0</span>
+						<span class='timer' id='s-hd'>0</span>
+					</div>
+					<div style='top: 0px; left: 149px;'>
+						<span class='timer timer-shadow' id='shadow-s-ld'>0</span>
+						<span class='timer' id='s-ld'>0</span>
+					</div>
+				</div>
+
+				<div
+					id='div-right-racer'
+					class='hcenter vcenter name-small'
+					style='left: 136px; top: 850px;'
+				>
+					<p id='right-racer' class='resize'>
+						{{.RightRacer}}
+					</p>
+				</div>
+
+				<div
+					id='div-right-team-name'
+					class='hcenter vcenter team-name-small'
+					style='top: 925px; left: 4px;'
+				>
+					<p id='right-team-name' class='resize'>
+						{{.RightTeam}}
+					</p>
+				</div>
+			</div> <!-- id: right-team -->
+
+		</div> <!-- id: view -->
+	</body>
+</html>

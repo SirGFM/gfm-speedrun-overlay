@@ -1,0 +1,70 @@
+
+@font-face {
+	font-family: 'SerifGothicBQ';
+	src: url(/res/priv/font/serif-gothic-bq-regular.otf) format('opentype');
+}
+
+@font-face {
+	font-family: 'SerifGothicBQ';
+	font-weight: bold;
+	src: url(/res/priv/font/SerifGothicBQ-Bold.otf) format('opentype');
+}
+
+p {
+	font-family: 'SerifGothicBQ';
+	padding: 0;
+	margin: 0;
+	text-shadow: -4px 0px 3px #000000,
+				 -2px 2px 3px #000000,
+				 2px 2px 3px #000000,
+				 2px -2px 3px #000000,
+				 -2px -2px 3px #000000;
+}
+
+html, body, div, p, img {
+	position: absolute;
+}
+
+html, body {
+	margin: 0;
+	padding: 0;
+	border: none;
+	color: #ffffff;
+	/* background-color: #400060; */
+	overflow: hidden;
+}
+
+html.res1080p, body.res1080p {
+	width: 1920px;
+	height: 1080px;
+}
+
+body.no-bg {
+	background: none;
+}
+
+div.hcenter {
+	display: inline-flex;
+	justify-content: center;
+	flex-direction: row;
+}
+
+p.resize {
+	max-height: inherit;
+	/* Use a stupidly big font to force resizing. */
+	font-size: 100px;
+	/* Allow words to break as soon as it's passed the element's width. */
+	overflow-wrap: anywhere;
+}
+
+img.pixelated {
+	/** Basic nearest-neighbour behaviour.
+	 * Source: http://stackoverflow.com/questions/14068103/disable-antialising-when-scaling-images */
+	image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+	image-rendering: -moz-crisp-edges;          /* Firefox                        */
+	image-rendering: -o-crisp-edges;            /* Opera                          */
+	image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+	image-rendering: pixelated;                 /* Chrome */
+	image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+	-ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}

@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title> {{.TwitchUsername}} Twitch IFrame </title>
+        <meta
+            charset="utf-8"
+            name="viewport"
+            content="width={{if .Width}}{{.Width}}{{else}}1920{{end}}, height={{if .Height}}{{.Height}}{{else}}1080{{end}}, initial-scale=1" />
+
+        <style>
+            html, body {
+                /* NOTE: There can't be any space between the dimension and
+                 * the unit! */
+                {{if .Width}}
+                    width: {{.Width}}px;
+                {{else}}
+                    width: 1920px;
+                {{end}}
+                {{if .Height}}
+                    height: {{.Height}}px;
+                {{else}}
+                    height: 1080px;
+                {{end}}
+                margin: 0;
+                padding: 0;
+                border: none;
+                overflow: hidden;
+            }
+        </style>
+
+        <script>
+            /** Work around for Twitch's "Purple Screen of Death" (limitations for embedded) */
+            window.location.replace('https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false')
+        </script>
+    </head>
+    <body>
+<!--
+        <iframe
+            src="https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false"
+            {{if .Width}}
+                width="{{.Width}}"
+            {{else}}
+                width="1920"
+            {{end}}
+            {{if .Height}}
+                height="{{.Height}}"
+            {{else}}
+                height="1080"
+            {{end}}
+            allowfullscreen="false"
+            muted="false"
+            allow="autoplay">
+        </iframe>
+-->
+    </body>
+</html>

@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title> Brat masters - setup </title>
+        <meta
+            charset="utf-8"
+            name="viewport"
+            content="width=1920, height=1080, initial-scale=1" />
+        <style>
+            html, body {
+                width: 1920px;
+                height: 1080px;
+                margin: 0;
+                padding: 0;
+                border: none;
+                overflow: hidden;
+            }
+            body {
+                background-color: #00000000;
+            }
+            iframe {
+                position: absolute;
+                margin: 0;
+                padding: 0;
+                top: 0;
+                left: 0;
+                border: none;
+            }
+            img {
+                position: absolute;
+                object-fit: contain;
+                width: 1920px;
+                height: 1080px;
+            }
+        </style>
+    </head>
+    <body>
+        <img src='/res/priv/img/Background.png'>
+        <img src='/res/priv/img/Abertura.png'>
+        <iframe
+            src="/tmpl/setup.go.html"
+            width="1920"
+            height="1080">
+        </iframe>
+    </body>
+</html>

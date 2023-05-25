@@ -1,0 +1,354 @@
+<html class="res1080p">
+	<head>
+		<title> Brat Masters pre-race </title>
+		<meta charset="utf-8" name="viewport" content="width=1920, height=1080, initial-scale=1" />
+
+		<link rel="stylesheet" href="/res/style/common.css">
+		<script type="text/javascript" src="/res/script/auto_reload.js"></script>
+		<script type="text/javascript" src="/res/script/auto_resize.js"></script>
+		<script type="text/javascript" src="/res/script/auto_vcenter.js"></script>
+		<script type="text/javascript" src="/res/script/conn.js"></script>
+		<script type="text/javascript" src="/res/script/timer.js"></script>
+
+		<style>
+			/*
+			body {
+				background: url('/res/img/base/setup-soon-trophy.png');
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			*/
+
+			div.team-name {
+				/** / background-color: gray; /**/
+				width: 592px;
+				height: 70px;
+				max-height: 70px;
+			}
+
+			div.name {
+				/** / background-color: gray; /**/
+				width: 592px;
+				height: 44px;
+				max-height: 44px;
+			}
+
+			img.trophy {
+				width: 70px;
+				height: 63px;
+			}
+
+			div.countdown-timer {
+				/** / background-color: gray; /**/
+				width: 600px;
+				height: 180px;
+				max-height: 180px;
+				line-height: 180px;
+				text-align: center;
+				visibility: hidden;
+			}
+
+			p.timer {
+				font-size: 153px;
+				width: inherit;
+				visibility: hidden;
+			}
+
+			span.timer-shadow {
+				color: #00000000;
+				text-shadow: -4px 0px 3px #000000,
+							 -2px 2px 3px #000000,
+							 2px 2px 3px #000000,
+							 2px -2px 3px #000000,
+							 -2px -2px 3px #000000;
+				z-index: -1;
+			}
+
+			span.timer {
+				font-size: 153px;
+				font-family: 'SerifGothicBQ';
+				padding: 0;
+				margin: 0;
+				width: 103px;
+				position: absolute;
+			}
+		</style>
+
+		<script>
+			/** How often the refresh function is called, in milliseconds. */
+			const refreshRateMs = 500;
+
+			/**
+			 * safe_run calls a function logging any exceptions.
+			 */
+			let safe_run = function (cb) {
+				try {
+					cb();
+				} catch (e) {
+					console.log(e);
+				}
+			}
+
+			/**
+			 * get_time updates the countdown timer, hiding or showing it as necessary.
+			 */
+			let get_time = function() {
+				timer.get(function(time) {
+					if (time.Time > 0) {
+						document.getElementById('div-timer-digits').style.visibility = 'visible';
+						document.getElementById('soon-tm').style.visibility = 'hidden';
+
+						timer.update_by_value('div-timer-digits', time.Time);
+					}
+					else {
+						document.getElementById('div-timer-digits').style.visibility = 'hidden';
+						document.getElementById('soon-tm').style.visibility = 'visible';
+					}
+				}, '/brat-handler/countdown');
+			}
+
+			/**
+			 * Register an update function, called every refreshRateMs,
+			 * after the page is done loading.
+			 */
+			document.addEventListener("DOMContentLoaded", function (event) {
+				{{if not .HideTimer}}
+					safe_run(get_time);
+				{{end}}
+
+				window.setInterval(function() {
+					safe_run(auto_reload.update);
+					{{if not .HideTimer}}
+						safe_run(get_time);
+					{{end}}
+				}, refreshRateMs);
+			});
+		</script>
+	</head>
+
+	<body class='no-bg res1080p'>
+		<!-- Empty div used so others may compute their length more easily -->
+		<div id='empty' style='width: 0; height: 0;'> </div>
+
+		<!-- Main area where everything is placed at -->
+		<div id='view' style='width: 1920; height: 1080;'>
+
+			<!--
+			  - Container for the trophies.
+			  -
+			  - Since every trophy is on the same vertical position,
+			  - it's set only once on the 'wins' div.
+			  -->
+			<div id='wins' style='top: 628px'>
+				{{if (gt .LeftTeamWinCount 0.0)}}
+					<div id='div-left-trophy-1'>
+						<img id='left-trophy-1'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 370px';
+						>
+					</div>
+				{{end}}
+
+				{{if (gt .LeftTeamWinCount 1.0)}}
+					<div id='div-left-trophy-2'>
+						<img id='left-trophy-2'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 460px';
+						>
+					</div>
+				{{end}}
+
+				{{if (gt .RightTeamWinCount 0.0)}}
+					<div id='div-right-trophy-1'>
+						<img id='right-trophy-1'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 1396px';
+						>
+					</div>
+				{{end}}
+
+				{{if (gt .RightTeamWinCount 1.0)}}
+					<div id='div-right-trophy-2'>
+						<img id='right-trophy-2'
+							class='pixelated trophy'
+							src='/res/priv/img/trofeu.png'
+							style='left: 1486px';
+						>
+					</div>
+				{{end}}
+			</div> <!-- id: wins -->
+
+			<!--
+			  - Container for the left team.
+			  -
+			  - Since every name is aligned,
+			  - the horizontal position is set only once
+			  - on the 'left-team' div.
+			  -->
+			<div id='left-team' style='left: 154px;'>
+				<div
+					id='div-left-team-name'
+					class='hcenter vcenter team-name'
+					style='top: 344px;'
+				>
+					<p id='left-team-name' class='resize'>
+						{{.LeftTeam}}
+					</p>
+				</div>
+
+				{{if (gt (len .LeftTeamMembers) 0)}}
+					<div
+						id='div-left-team-member-1'
+						class='hcenter vcenter name'
+						style='top: 442px;'
+					>
+						<p id='left-team-member-1' class='resize'>
+							{{index .LeftTeamMembers 0}}
+						</p>
+					</div>
+				{{end}}
+
+				{{if (gt (len .LeftTeamMembers) 1)}}
+					<div
+						id='div-left-team-member-2'
+						class='hcenter vcenter name'
+						style='top: 492px;'
+					>
+						<p id='left-team-member-2' class='resize'>
+							{{index .LeftTeamMembers 1}}
+						</p>
+					</div>
+				{{end}}
+
+				{{if (gt (len .LeftTeamMembers) 2)}}
+					<div
+						id='div-left-team-member-3'
+						class='hcenter vcenter name'
+						style='top: 542px;'
+					>
+						<p id='left-team-member-3' class='resize'>
+							{{index .LeftTeamMembers 2}}
+						</p>
+					</div>
+				{{end}}
+			</div> <!-- id: left-team -->
+
+			<!--
+			  - Container for the right team.
+			  -
+			  - Since every name is aligned,
+			  - the horizontal position is set only once
+			  - on the 'right-team' div.
+			  -->
+			<div id='right-team' style='left: 1180px;'>
+				<div
+					id='div-right-team-name'
+					class='hcenter vcenter team-name'
+					style='top: 344px;'
+				>
+					<p id='right-team-name' class='resize'>
+						{{.RightTeam}}
+					</p>
+				</div>
+
+				{{if (gt (len .RightTeamMembers) 0)}}
+					<div
+						id='div-right-team-member-1'
+						class='hcenter vcenter name'
+						style='top: 442px;'
+					>
+						<p id='right-team-member-1' class='resize'>
+							{{index .RightTeamMembers 0}}
+						</p>
+					</div>
+				{{end}}
+
+				{{if (gt (len .RightTeamMembers) 1)}}
+					<div
+						id='div-right-team-member-2'
+						class='hcenter vcenter name'
+						style='top: 492px;'
+					>
+						<p id='right-team-member-2' class='resize'>
+							{{index .RightTeamMembers 1}}
+						</p>
+					</div>
+				{{end}}
+
+				{{if (gt (len .RightTeamMembers) 2)}}
+					<div
+						id='div-right-team-member-3'
+						class='hcenter vcenter name'
+						style='top: 542px;'
+					>
+						<p id='right-team-member-3' class='resize'>
+							{{index .RightTeamMembers 2}}
+						</p>
+					</div>
+				{{end}}
+			</div> <!-- id: right-team -->
+
+			{{if not .HideTimer}}
+				<!--
+				  - Container for the timer.
+				  -->
+				<div
+					id='div-timer'
+					class='countdown-timer'
+					style='left: 660px; top: 847px;'
+				>
+					<p id='soon-tm' class='timer'>
+						BREVE
+					</p>
+
+					<div
+						id='div-timer-digits'
+						class='countdown-timer'
+					>
+						<div style='top: 0px; left: 70px;'>
+							<span class='timer timer-shadow' id='shadow-min-hd'>4</span>
+							<span class='timer' id='min-hd'>4</span>
+						</div>
+						<div style='top: 0px; left: 172px;'>
+							<span class='timer timer-shadow' id='shadow-min-ld'>4</span>
+							<span class='timer' id='min-ld'>4</span>
+						</div>
+						<div style='top: 0px; left: 249px;'>
+							<span class='timer timer-shadow' id='shadow-s-colon'>:</span>
+							<span class='timer' id='s-colon'>:</span>
+						</div>
+						<div style='top: 0px; left: 325px;'>
+							<span class='timer timer-shadow' id='shadow-s-hd'>4</span>
+							<span class='timer' id='s-hd'>4</span>
+						</div>
+						<div style='top: 0px; left: 427px;'>
+							<span class='timer timer-shadow' id='shadow-s-ld'>4</span>
+							<span class='timer' id='s-ld'>4</span>
+						</div>
+					</div>
+				</div> <!-- id: timer -->
+			{{else}}
+				<!--
+				  - Container for the winning team.
+				  -->
+				<div
+					id='div-winner'
+					class='hcenter vcenter'
+					style='width: 800px; height: 76px; max-height: 76px; left: 560px; top: 856px;'
+				>
+					<p id='winner' class='resize' style='font-size: 100px'>
+						{{if (gt .LeftTeamWinCount .RightTeamWinCount)}}
+							{{.LeftTeam}}
+						{{else}}
+							{{.RightTeam}}
+						{{end}}
+					</p>
+				</div> <!-- id: timer -->
+			{{end}}
+
+		</div> <!-- id: view -->
+	</body>
+</html>
