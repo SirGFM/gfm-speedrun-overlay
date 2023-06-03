@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/SirGFM/gfm-speedrun-overlay/cmd/brat-masters/brat-handler"
+	"brat-masters/brat-handler"
 	"github.com/SirGFM/gfm-speedrun-overlay/logger"
 	"github.com/SirGFM/gfm-speedrun-overlay/web/res"
 	"github.com/SirGFM/gfm-speedrun-overlay/web/server"
