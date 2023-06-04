@@ -29,13 +29,13 @@
 
         <script>
             /** Work around for Twitch's "Purple Screen of Death" (limitations for embedded) */
-            window.location.replace('https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false')
+            window.location.replace('https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false&volume=1')
         </script>
     </head>
     <body>
 <!--
         <iframe
-            src="https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false"
+            src="https://player.twitch.tv/?channel={{.TwitchUsername}}&parent=localhost&muted=false&autoplay=true&player=popout&enableExtensions=false&volume=1"
             {{if .Width}}
                 width="{{.Width}}"
             {{else}}
