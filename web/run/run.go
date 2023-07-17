@@ -718,6 +718,11 @@ func (ctx *runCtx) post(w http.ResponseWriter, req *http.Request, urlPath []stri
             // Make sure the timer is restarted if it had stopped
             r.timer.Start()
         }
+        if r.Current < len(r.Splits) {
+            // Recover the previous end/best time.
+            r.Splits[r.Current].EndTime = r.Best[r.Current].EndTime
+            r.Splits[r.Current].BestTime = r.Best[r.Current].BestTime
+        }
     case "skip":
         if r.Current < len(r.Splits) {
             r.Splits[r.Current].Skipped = true
