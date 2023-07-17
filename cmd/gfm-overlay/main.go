@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -30,6 +31,9 @@ func mkreldir(dir string) string {
 }
 
 func main() {
+	enableHotkeys := flag.Bool("enable-hotkeys", false, "Whether keyboard hotkeys should be enabled")
+	flag.Parse()
+
 	srv := server.New()
 
 	/* === RES (DEFAULT) ========================================== */
@@ -88,6 +92,12 @@ func main() {
 		log.Fatalf("Failed to start server: %+v", err)
 	}
 	defer lst.Close()
+
+	/* === HOTKEYS ================================================ */
+	if *enableHotkeys {
+		hotkeys := StartHotkeys("http://localhost:8080")
+		defer hotkeys.Close()
+	}
 
 	intHndlr := make(chan os.Signal, 1)
 	signal.Notify(intHndlr, os.Interrupt)
