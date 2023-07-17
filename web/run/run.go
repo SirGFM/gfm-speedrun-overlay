@@ -139,11 +139,38 @@ import (
     "net/http"
     "os"
     "path"
+    "strconv"
     "sync"
     "time"
 )
 
 const Prefix = "/run"
+
+type DurationMs struct {
+    time.Duration
+}
+
+// MarshalJSON implements json.Marshaler,
+// so this type may automatically convert itself to milliseconds in the JSON.
+func (dur DurationMs) MarshalJSON() ([]byte, error) {
+    ms := dur.Milliseconds()
+    str := strconv.FormatInt(ms, 10)
+    return []byte(str), nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler,
+// so a duration in milliseconds may be automatically decoded from the JSON.
+func (dur *DurationMs) UnmarshalJSON(data []byte) error {
+    var ms int64
+
+    err := json.Unmarshal(data, &ms)
+    if err != nil {
+        return err
+    }
+
+    dur.Duration = time.Duration(ms) * time.Millisecond
+    return nil
+}
 
 // An entry in the currently tracked run, for tracking how long that
 // specific segment took and comparing it to a personal best.
@@ -151,11 +178,11 @@ type split struct {
     // The split's name.
     Name string
     // The fastest completion time for this split.
-    BestTime time.Duration
+    BestTime DurationMs
     // The split's starting time, from the start of the run.
-    StartTime time.Duration
+    StartTime DurationMs
     // The split's ending time, from the start of the run.
-    EndTime time.Duration
+    EndTime DurationMs
     // Whether the split was skipped.
     Skipped bool
 }
@@ -303,7 +330,7 @@ func (r *run) resetRun() {
 // Start the run.
 func (r *run) start() {
     r.Started = true
-    r.Splits[0].StartTime = r.timer.Get()
+    r.Splits[0].StartTime.Duration = r.timer.Get()
     r.timer.Start()
 }
 
@@ -315,9 +342,9 @@ func (r run) getSplitStartingTime() time.Duration {
     if r.Current == 0 {
         return 0
     } else if last := &r.Splits[r.Current-1]; last.Skipped {
-        return last.StartTime
+        return last.StartTime.Duration
     } else {
-        return last.EndTime
+        return last.EndTime.Duration
     }
 }
 
@@ -325,7 +352,7 @@ func (r run) getSplitStartingTime() time.Duration {
 func (r *run) advanceSplits() {
     r.Current++
     if r.Current < len(r.Splits) {
-        r.Splits[r.Current].StartTime = r.getSplitStartingTime()
+        r.Splits[r.Current].StartTime.Duration = r.getSplitStartingTime()
     } else {
         r.timer.Stop()
     }
@@ -334,10 +361,10 @@ func (r *run) advanceSplits() {
 // Finish the current segment, updating its best time, if it were beaten.
 func (r *run) finishSegment() {
     cur := &r.Splits[r.Current]
-    cur.EndTime = r.timer.Get()
+    cur.EndTime.Duration = r.timer.Get()
     cur.Skipped = false
-    if cur.EndTime - cur.StartTime > cur.BestTime {
-        cur.BestTime = cur.EndTime - cur.StartTime
+    if dt := cur.EndTime.Duration - cur.StartTime.Duration; dt > cur.BestTime.Duration {
+        cur.BestTime.Duration = dt
     }
 }
 
@@ -347,7 +374,7 @@ func (r *run) saveRun() error {
         return newError(nil, "Run still hasn't finished", http.StatusBadRequest)
     }
 
-    if last := r.Current - 1; r.Splits[last].EndTime < r.Best[last].EndTime || r.Best[last].EndTime == 0 {
+    if last := r.Current - 1; r.Splits[last].EndTime.Duration < r.Best[last].EndTime.Duration || r.Best[last].EndTime.Duration == 0 {
         // Update the best run
         r.Best = nil
         for i := range r.Splits {
