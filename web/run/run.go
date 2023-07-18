@@ -140,6 +140,7 @@ import (
     "os"
     "path"
     "strconv"
+    "strings"
     "sync"
     "time"
 )
@@ -480,7 +481,11 @@ func (ctx *runCtx) getRunIndex(name string) (runIndexer, error) {
     var idx runIndexer
 
     idx.name = name
-    idx.categoryDir = path.Join(ctx.baseDir, name)
+
+    // Remove slashs from the name
+    dirName := strings.Replace(name, "/", "%2f", -1)
+    dirName = strings.Replace(dirName, "\\", "%5c", -1)
+    idx.categoryDir = path.Join(ctx.baseDir, dirName)
 
     // Retrieve the splits for the game/category (in the local server)
     entries, err := splits.GetSplits(name, "localhost", ctx.listeningPort)
