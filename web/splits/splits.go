@@ -74,6 +74,7 @@ import (
     "net/url"
     "os"
     "path"
+    "strings"
     "sync"
 )
 
@@ -118,7 +119,16 @@ func (*splitsCtx) Close() {
 
 // Convert a name, as supplied in an URL, into a local file path.
 func (ctx *splitsCtx) getFileName(name string) string {
-    safeName := url.PathEscape(name)
+    // QueryEscape converts space to '+',
+    // while PathEscape doesn't escape every character...
+    // Achieve a middle ground by splitting every space-separated fragment,
+    // and then manually joining those.
+    var fragments []string
+    for _, fragment := range strings.Split(name, " ") {
+        fragments = append(fragments, url.QueryEscape(fragment))
+    }
+    safeName := strings.Join(fragments, url.PathEscape(" "))
+
     return path.Join(ctx.baseDir, safeName+".json")
 }
 
