@@ -31,8 +31,14 @@ func mkreldir(dir string) string {
 }
 
 func main() {
-	enableHotkeys := flag.Bool("enable-hotkeys", false, "Whether keyboard hotkeys should be enabled")
+	hotkeyConfig := flag.String("hotkey-config", "", "The configuration file with the hotkeys")
+	printKeys := flag.Bool("print-keys", false, "Print the valid keys and exit")
 	flag.Parse()
+
+	if *printKeys {
+		PrintKeys()
+		return
+	}
 
 	srv := server.New()
 
@@ -94,8 +100,8 @@ func main() {
 	defer lst.Close()
 
 	/* === HOTKEYS ================================================ */
-	if *enableHotkeys {
-		hotkeys := StartHotkeys("http://localhost:8080")
+	if *hotkeyConfig != "" {
+		hotkeys := StartHotkeys("http://localhost:8080", *hotkeyConfig)
 		defer hotkeys.Close()
 	}
 

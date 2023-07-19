@@ -24,6 +24,46 @@ go build .
 
 ## Hotkeys
 
+Hotkeys may be configured with a `config.ini` file.
+Each `[segment]` in this file must define a hotkey,
+with the name of the segment being the key and accepting the attributes:
+
+- `run`: the action when a category was configured
+- `timer`: the action used when there's no category
+
+Also, the special segment `[config]` accepts the attribute `pool-rate`,
+which determines how many times the keyboard is checked per second.
+
+The config file must be specified on the argument `hotkey-config`,
+and the list of keys may be obtained with the argument `print-keys`.
+
+### Example
+
+The config file bellow is mapped to the following actions:
+
+```ini
+[config]
+	pool-rate = 10
+
+[esc]
+	timer = reset
+	run = reset
+
+[space]
+	timer = stop
+	run = split
+
+[backspace]
+	run = undo
+
+[return]
+	timer = start
+	run = start
+
+[s]
+	run = save
+```
+
 | Key | Timer Action | Category Action |
 | -- | -- | -- |
 | Enter | Start/Continue | Start |

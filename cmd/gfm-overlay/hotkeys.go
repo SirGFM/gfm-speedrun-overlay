@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	key_events "github.com/SirGFM/gfm-speedrun-overlay/local/key-events"
@@ -126,7 +128,7 @@ func (h *Hotkey) handle(pressed bool) {
 }
 
 // StartHotkeys starts listening for hotkeys.
-func StartHotkeys(baseURL string) io.Closer {
+func StartHotkeys(baseURL, configFilename string) io.Closer {
 	c := ctx{
 		client:  &http.Client{},
 		baseURL: baseURL,
@@ -135,56 +137,67 @@ func StartHotkeys(baseURL string) io.Closer {
 
 	go c.run()
 
-	esc := Hotkey{
-		c:           &c,
-		timerAction: "reset",
-		runAction:   "reset",
+	keyConfig := key_events.WatcherConfig{
+		PoolPerSec:   10,
+		OnKeyPress:   make(map[key_logger.Key]key_events.Action),
+		OnKeyRelease: make(map[key_logger.Key]key_events.Action),
 	}
 
-	space := Hotkey{
-		c:           &c,
-		timerAction: "stop",
-		runAction:   "split",
+	config := parseINI(configFilename)
+
+	if data, ok := config["config"]; ok {
+		poolRate := data["pool-rate"]
+		if poolRate != "" {
+			num, err := strconv.ParseInt(poolRate, 0, 32)
+			if err != nil {
+				logger.Fatalf("hotkeys: Failed to parse [config].pool-rate: %+v", err)
+			}
+
+			keyConfig.PoolPerSec = int(num)
+			logger.Infof("hotkeys: pool rate - %d per second", num)
+		}
+
+		delete(config, "config")
 	}
 
-	backspace := Hotkey{
-		c:           &c,
-		timerAction: "",
-		runAction:   "undo",
+	for keyName, values := range config {
+		key := key_logger.GetKey(keyName)
+		if key == 0 {
+			logger.Warnf("hotkeys: ignoring invalid key '%s'", key)
+			continue
+		}
+
+		hotkey := Hotkey{
+			c:           &c,
+			timerAction: values["timer"],
+			runAction:   values["run"],
+		}
+
+		keyConfig.OnKeyPress[key] = &hotkey
+		keyConfig.OnKeyRelease[key] = &hotkey
+
+		logger.Infof(
+			"hotkeys: registered key '%s' with actions: (run: '%s') (timer: '%s')",
+			keyName,
+			hotkey.timerAction,
+			hotkey.runAction,
+		)
 	}
 
-	enter := Hotkey{
-		c:           &c,
-		timerAction: "start",
-		runAction:   "start",
-	}
-
-	sKey := Hotkey{
-		c:           &c,
-		timerAction: "",
-		runAction:   "save",
-	}
-
-	cfg := key_events.WatcherConfig{
-		PoolPerSec: 10,
-		OnKeyPress: map[key_logger.Key]key_events.Action{
-			key_logger.Backspace: &backspace,
-			key_logger.Return:    &enter,
-			key_logger.Space:     &space,
-			key_logger.Esc:       &esc,
-			key_logger.S:         &sKey,
-		},
-		OnKeyRelease: map[key_logger.Key]key_events.Action{
-			key_logger.Backspace: &backspace,
-			key_logger.Return:    &enter,
-			key_logger.Space:     &space,
-			key_logger.Esc:       &esc,
-			key_logger.S:         &sKey,
-		},
-	}
-
-	keyWatcher := key_events.NewEventWatcher(cfg)
+	keyWatcher := key_events.NewEventWatcher(keyConfig)
 	go c.eventHandler()
 
 	return keyWatcher
+}
+
+func PrintKeys() {
+	var key key_logger.Key
+
+	fmt.Println("Valid keys:")
+	for ; key < key_logger.KeyCount; key++ {
+		keyName := strings.ToLower(key.String())
+		if keyName != "" {
+			fmt.Printf("\t - %s\n", keyName)
+		}
+	}
 }
