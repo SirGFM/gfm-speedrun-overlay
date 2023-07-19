@@ -19,6 +19,13 @@ const tokenName = "run-token"
 // How long between the checks of the server's configuration.
 const refreshRate = 5 * time.Second
 
+type event struct {
+	// The key that received the event.
+	actor *Hotkey
+	// Whether the key was pressed or released.
+	pressed bool
+}
+
 type ctx struct {
 	// The HTTP client that should be used by the entire application.
 	client *http.Client
@@ -28,6 +35,8 @@ type ctx struct {
 	token string
 	// Synchronizes access to token.
 	tokenMutex sync.RWMutex
+	// Channel used to receive and handle events in hotkeys.
+	events chan event
 }
 
 // fetchToken fetches the configured token, if any.
@@ -114,5 +123,12 @@ func (c *ctx) run() {
 		}
 
 		c.swapToken(token)
+	}
+}
+
+// eventHandler handle hotkey events received from the key logger.
+func (c *ctx) eventHandler() {
+	for event := range c.events {
+		event.actor.handle(event.pressed)
 	}
 }

@@ -23,20 +23,27 @@ const runEndpoint = "/run"
 const timerEndpoint = "/timer"
 
 type Hotkey struct {
-	// Channel used to signal that the key state changed.
-	press chan bool
 	// The parent context.
 	c *ctx
 	// Timer action executed when the context doesn't have a token.
 	timerAction string
 	// Run action executed when the context has a token.
 	runAction string
+	// When the last event was received.
+	lastPress time.Time
+	// Whether the key was pressed in a previous event.
+	isPressed bool
+	// Whether the event has already been dispatched for the current press.
+	dispatched bool
 }
 
 // Execute implements key_events.Action,
 // forwarding events to the hotkey.
 func (h *Hotkey) Execute(pressed bool) {
-	h.press <- pressed
+	h.c.events <- event{
+		actor:   h,
+		pressed: pressed,
+	}
 }
 
 // sendRunAction sends an action to the /run endpoint.
@@ -83,41 +90,39 @@ func (h *Hotkey) sendTimerAction() {
 	}
 }
 
-// run watches for events,
-// and executes the hotkey if the key is held down for at least threshold.
-func (h *Hotkey) run() {
-	lastPress := time.Now()
-	wasPressed := false
-	executed := false
-
-	for pressed := range h.press {
-		// Update the instant when the key was first pressed.
-		if pressed && !wasPressed {
-			lastPress = time.Now()
-		}
-
-		// Check if the key was pressed for long enough,
-		// and fire the key's action.
-		dt := time.Since(lastPress)
-		if dt >= threshold && !executed {
-			token := h.c.getToken()
-
-			if token != "" {
-				h.sendRunAction(token)
-			} else {
-				h.sendTimerAction()
-			}
-
-			// Block re-executions if the key is being held down.
-			executed = pressed
-		}
-
-		wasPressed = pressed
-
-		// After the command was executed while pressed,
-		// block it until the button was released again.
-		executed = executed && pressed
+// handle manages the key press,
+// dispatching the command if the key is held down for at least threshold.
+func (h *Hotkey) handle(pressed bool) {
+	if h.lastPress.IsZero() {
+		h.lastPress = time.Now()
 	}
+
+	// Update the instant when the key was first pressed.
+	if pressed && !h.isPressed {
+		h.lastPress = time.Now()
+	}
+
+	// Check if the key was pressed for long enough,
+	// and fire the key's action.
+	dt := time.Since(h.lastPress)
+	if dt >= threshold && !h.dispatched {
+		token := h.c.getToken()
+
+		if token != "" {
+			h.sendRunAction(token)
+		} else {
+			h.sendTimerAction()
+		}
+
+		// Block re-executions if the key is being held down.
+		h.dispatched = pressed
+	}
+
+	h.isPressed = pressed
+
+	// After the command was executed while pressed,
+	// block it until the button was released again.
+	h.dispatched = h.dispatched && pressed
 }
 
 // StartHotkeys starts listening for hotkeys.
@@ -125,52 +130,43 @@ func StartHotkeys(baseURL string) io.Closer {
 	c := ctx{
 		client:  &http.Client{},
 		baseURL: baseURL,
+		events:  make(chan event, 100),
 	}
 
 	go c.run()
 
 	esc := Hotkey{
-		press:       make(chan bool, 10),
 		c:           &c,
 		timerAction: "reset",
 		runAction:   "reset",
 	}
-	go esc.run()
 
 	space := Hotkey{
-		press:       make(chan bool, 10),
 		c:           &c,
 		timerAction: "stop",
 		runAction:   "split",
 	}
-	go space.run()
 
 	backspace := Hotkey{
-		press:       make(chan bool, 10),
 		c:           &c,
 		timerAction: "",
 		runAction:   "undo",
 	}
-	go backspace.run()
 
 	enter := Hotkey{
-		press:       make(chan bool, 10),
 		c:           &c,
 		timerAction: "start",
 		runAction:   "start",
 	}
-	go enter.run()
 
 	sKey := Hotkey{
-		press:       make(chan bool, 10),
 		c:           &c,
 		timerAction: "",
 		runAction:   "save",
 	}
-	go sKey.run()
 
 	cfg := key_events.WatcherConfig{
-		PoolPerSec: 20,
+		PoolPerSec: 10,
 		OnKeyPress: map[key_logger.Key]key_events.Action{
 			key_logger.Backspace: &backspace,
 			key_logger.Return:    &enter,
@@ -188,5 +184,7 @@ func StartHotkeys(baseURL string) io.Closer {
 	}
 
 	keyWatcher := key_events.NewEventWatcher(cfg)
+	go c.eventHandler()
+
 	return keyWatcher
 }
