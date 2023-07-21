@@ -57,8 +57,8 @@ github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAE
 github.com/SirGFM/GoWebSocketProxy v0.0.0-20180921104100-432a7fd349c8/go.mod h1:eLqoIh6wsOak37uZNYOxhV7XcNCLBNVKjK3qSBoMC7A=
 github.com/SirGFM/MTTitleCard v1.0.0-RC1 h1:DszuWACe9xf5+2mtvYpko/1g7FjV4UdKO0twvqTIsI8=
 github.com/SirGFM/MTTitleCard v1.0.0-RC1/go.mod h1:4csaMiHeL6+/DrCPL5q9nQpSn2225r2zYZyhUoS9g30=
-github.com/SirGFM/goLogKeys v0.0.0-20220508013801-f24c9b0db710 h1:XZL62/WlD6CZtLRsQox5jAdQ1wFwGeDXMPYT0R0BSEg=
-github.com/SirGFM/goLogKeys v0.0.0-20220508013801-f24c9b0db710/go.mod h1:nGXL1cUlJPgIpKHoQqgvDfrJrMUX3Ybep4jeGgNhIuw=
+github.com/SirGFM/goLogKeys v0.0.0-20230721190202-4b9d0f739c27 h1:E8tpV0mPCm7/2XDzxpfIRHop1oJ0wx51N869WFpdy4Y=
+github.com/SirGFM/goLogKeys v0.0.0-20230721190202-4b9d0f739c27/go.mod h1:nGXL1cUlJPgIpKHoQqgvDfrJrMUX3Ybep4jeGgNhIuw=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
@@ -368,8 +368,9 @@ golang.org/x/sys v0.0.0-20220209214540-3681064d5158/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220328115105-d36c6a25d886/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220412211240-33da011f77ad/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 h1:xHms4gcpe1YE7A3yIllJXP16CMAGuqwO2lX1mTyyRRc=
 golang.org/x/sys v0.0.0-20220422013727-9388b58f7150/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.10.0 h1:SqMFp9UcQJZa+pmYuAKjd9xq1f0j5rLcDIk0mj4qAsA=
+golang.org/x/sys v0.10.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=

@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/SirGFM/MTTitleCard v1.0.0-RC1
-	github.com/SirGFM/goLogKeys v0.0.0-20220508013801-f24c9b0db710
-	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150
+	github.com/SirGFM/goLogKeys v0.0.0-20230721190202-4b9d0f739c27
+	golang.org/x/sys v0.10.0
 )
 
 require (
