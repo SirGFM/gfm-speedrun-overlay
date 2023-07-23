@@ -364,7 +364,7 @@ func (r *run) finishSegment() {
     cur := &r.Splits[r.Current]
     cur.EndTime.Duration = r.timer.Get()
     cur.Skipped = false
-    if dt := cur.EndTime.Duration - cur.StartTime.Duration; dt > cur.BestTime.Duration {
+    if dt := cur.EndTime.Duration - cur.StartTime.Duration; dt < cur.BestTime.Duration {
         cur.BestTime.Duration = dt
     }
 }
