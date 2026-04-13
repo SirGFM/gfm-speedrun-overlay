@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/SirGFM/MTTitleCard v1.0.0
-	github.com/SirGFM/goLogKeys v1.0.0
+	github.com/SirGFM/goLogKeys v1.0.1
 	golang.org/x/sys v0.43.0
 )
 
